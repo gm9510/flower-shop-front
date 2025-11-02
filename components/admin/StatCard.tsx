@@ -18,7 +18,6 @@ export default function StatCard({
   value,
   icon: Icon,
   iconColor = "bg-blue-500",
-  trend,
   description
 }: StatCardProps) {
   return (
@@ -39,13 +38,6 @@ export default function StatCard({
                 <div className="text-2xl font-bold text-gray-900">
                   {value}
                 </div>
-                {trend && (
-                  <div className={`ml-2 flex items-baseline text-sm font-semibold ${
-                    trend.isPositive ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {trend.isPositive ? '+' : ''}{trend.value}%
-                  </div>
-                )}
               </dd>
               {description && (
                 <div className="text-xs text-muted-foreground mt-1">

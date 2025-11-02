@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api';
-import type { Customer } from '@/types/shop';
+import type { Cliente } from '@/types/shop';
 import type { ApiResponse } from '@/types/api';
 
 interface LoginCredentials {
@@ -16,7 +16,7 @@ interface RegisterData {
 }
 
 interface AuthResponse {
-  user: Customer;
+  user: Cliente;
   token: string;
   refreshToken: string;
 }
@@ -80,13 +80,13 @@ export const authService = {
   },
 
   // Get current user
-  async getCurrentUser(): Promise<ApiResponse<Customer>> {
-    return apiClient.get<ApiResponse<Customer>>('/auth/me');
+  async getCurrentUser(): Promise<ApiResponse<Cliente>> {
+    return apiClient.get<ApiResponse<Cliente>>('/auth/me');
   },
 
   // Update profile
-  async updateProfile(updates: Partial<Customer>): Promise<ApiResponse<Customer>> {
-    const response = await apiClient.patch<ApiResponse<Customer>>('/auth/profile', updates);
+  async updateProfile(updates: Partial<Cliente>): Promise<ApiResponse<Cliente>> {
+    const response = await apiClient.patch<ApiResponse<Cliente>>('/auth/profile', updates);
     
     if (response.success) {
       localStorage.setItem('user', JSON.stringify(response.data));
@@ -122,7 +122,7 @@ export const authService = {
   },
 
   // Get stored user data
-  getStoredUser(): Customer | null {
+  getStoredUser(): Cliente | null {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
   },

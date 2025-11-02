@@ -1,0 +1,2432 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "API de Floristería con MariaDB",
+        "description": "API para la gestión de una floristería",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/categorias": {
+            "get": {
+                "tags": [
+                    "categorias"
+                ],
+                "summary": "Get Categorias",
+                "operationId": "get_categorias_categorias_get",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "Skip"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 100,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CategoriaResponse"
+                                    },
+                                    "title": "Response Get Categorias Categorias Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "categorias"
+                ],
+                "summary": "Create Categoria",
+                "operationId": "create_categoria_categorias_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoriaCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategoriaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/productos": {
+            "get": {
+                "tags": [
+                    "productos"
+                ],
+                "summary": "Get Productos",
+                "operationId": "get_productos_productos_get",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "Skip"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 100,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProductoResponse"
+                                    },
+                                    "title": "Response Get Productos Productos Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "productos"
+                ],
+                "summary": "Create Producto",
+                "operationId": "create_producto_productos_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductoCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/clientes": {
+            "get": {
+                "tags": [
+                    "clientes"
+                ],
+                "summary": "Get Clientes",
+                "operationId": "get_clientes_clientes_get",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "Skip"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 100,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ClienteResponse"
+                                    },
+                                    "title": "Response Get Clientes Clientes Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "clientes"
+                ],
+                "summary": "Create Cliente",
+                "operationId": "create_cliente_clientes_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClienteCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClienteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/inventario": {
+            "get": {
+                "tags": [
+                    "inventario"
+                ],
+                "summary": "Get Inventario",
+                "operationId": "get_inventario_inventario_get",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "Skip"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 100,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/InventarioResponse"
+                                    },
+                                    "title": "Response Get Inventario Inventario Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "inventario"
+                ],
+                "summary": "Create Inventario",
+                "operationId": "create_inventario_inventario_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InventarioCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InventarioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/cupones": {
+            "get": {
+                "tags": [
+                    "cupones"
+                ],
+                "summary": "Get Cupones",
+                "operationId": "get_cupones_cupones_get",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "Skip"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 100,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CuponResponse"
+                                    },
+                                    "title": "Response Get Cupones Cupones Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "cupones"
+                ],
+                "summary": "Create Cupon",
+                "operationId": "create_cupon_cupones_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CuponCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CuponResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metodos-envio": {
+            "get": {
+                "tags": [
+                    "metodos-envio"
+                ],
+                "summary": "Get Metodos Envio",
+                "operationId": "get_metodos_envio_metodos_envio_get",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "Skip"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 100,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MetodoEnvioResponse"
+                                    },
+                                    "title": "Response Get Metodos Envio Metodos Envio Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "metodos-envio"
+                ],
+                "summary": "Create Metodo Envio",
+                "operationId": "create_metodo_envio_metodos_envio_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MetodoEnvioCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MetodoEnvioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/sedes": {
+            "get": {
+                "tags": [
+                    "sedes"
+                ],
+                "summary": "Get Sedes",
+                "operationId": "get_sedes_sedes_get",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "Skip"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 100,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SedeResponse"
+                                    },
+                                    "title": "Response Get Sedes Sedes Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "sedes"
+                ],
+                "summary": "Create Sede",
+                "operationId": "create_sede_sedes_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SedeCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SedeResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entidades": {
+            "get": {
+                "tags": [
+                    "entidades"
+                ],
+                "summary": "Get Entidades",
+                "operationId": "get_entidades_entidades_get",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "Skip"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 100,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EntidadResponse"
+                                    },
+                                    "title": "Response Get Entidades Entidades Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "entidades"
+                ],
+                "summary": "Create Entidad",
+                "operationId": "create_entidad_entidades_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EntidadCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EntidadResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pedidos": {
+            "get": {
+                "tags": [
+                    "pedidos"
+                ],
+                "summary": "Get Pedidos",
+                "description": "Obtener lista de pedidos con filtros opcionales y paginación",
+                "operationId": "get_pedidos_pedidos_get",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Número de registros a omitir",
+                            "default": 0,
+                            "title": "Skip"
+                        },
+                        "description": "Número de registros a omitir"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "description": "Número máximo de registros a retornar",
+                            "default": 100,
+                            "title": "Limit"
+                        },
+                        "description": "Número máximo de registros a retornar"
+                    },
+                    {
+                        "name": "cliente_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "integer"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Filtrar por ID de cliente",
+                            "title": "Cliente Id"
+                        },
+                        "description": "Filtrar por ID de cliente"
+                    },
+                    {
+                        "name": "estado_pedido",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Filtrar por estado del pedido",
+                            "title": "Estado Pedido"
+                        },
+                        "description": "Filtrar por estado del pedido"
+                    },
+                    {
+                        "name": "estado_pago",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Filtrar por estado del pago",
+                            "title": "Estado Pago"
+                        },
+                        "description": "Filtrar por estado del pago"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PedidosResponse"
+                                    },
+                                    "title": "Response Get Pedidos Pedidos Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "pedidos"
+                ],
+                "summary": "Create Pedido",
+                "description": "Crear un nuevo pedido",
+                "operationId": "create_pedido_pedidos_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PedidosCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PedidosResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pedidos/{pedido_id}": {
+            "get": {
+                "tags": [
+                    "pedidos"
+                ],
+                "summary": "Get Pedido",
+                "description": "Obtener un pedido específico por ID con información detallada",
+                "operationId": "get_pedido_pedidos__pedido_id__get",
+                "parameters": [
+                    {
+                        "name": "pedido_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "description": "ID del pedido",
+                            "title": "Pedido Id"
+                        },
+                        "description": "ID del pedido"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PedidosDetail"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "pedidos"
+                ],
+                "summary": "Update Pedido",
+                "description": "Actualizar un pedido existente",
+                "operationId": "update_pedido_pedidos__pedido_id__put",
+                "parameters": [
+                    {
+                        "name": "pedido_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "description": "ID del pedido",
+                            "title": "Pedido Id"
+                        },
+                        "description": "ID del pedido"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PedidosUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PedidosResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "pedidos"
+                ],
+                "summary": "Delete Pedido",
+                "description": "Eliminar un pedido (soft delete recomendado, pero aquí implementamos hard delete)",
+                "operationId": "delete_pedido_pedidos__pedido_id__delete",
+                "parameters": [
+                    {
+                        "name": "pedido_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "description": "ID del pedido",
+                            "title": "Pedido Id"
+                        },
+                        "description": "ID del pedido"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pedidos/{pedido_id}/estado": {
+            "patch": {
+                "tags": [
+                    "pedidos"
+                ],
+                "summary": "Update Pedido Estado",
+                "description": "Actualizar solo los estados de un pedido (endpoint especializado)",
+                "operationId": "update_pedido_estado_pedidos__pedido_id__estado_patch",
+                "parameters": [
+                    {
+                        "name": "pedido_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "description": "ID del pedido",
+                            "title": "Pedido Id"
+                        },
+                        "description": "ID del pedido"
+                    },
+                    {
+                        "name": "estado_pedido",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Nuevo estado del pedido",
+                            "title": "Estado Pedido"
+                        },
+                        "description": "Nuevo estado del pedido"
+                    },
+                    {
+                        "name": "estado_pago",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Nuevo estado del pago",
+                            "title": "Estado Pago"
+                        },
+                        "description": "Nuevo estado del pago"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PedidosResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pedidos/cliente/{cliente_id}": {
+            "get": {
+                "tags": [
+                    "pedidos"
+                ],
+                "summary": "Get Pedidos By Cliente",
+                "description": "Obtener todos los pedidos de un cliente específico",
+                "operationId": "get_pedidos_by_cliente_pedidos_cliente__cliente_id__get",
+                "parameters": [
+                    {
+                        "name": "cliente_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "description": "ID del cliente",
+                            "title": "Cliente Id"
+                        },
+                        "description": "ID del cliente"
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Número de registros a omitir",
+                            "default": 0,
+                            "title": "Skip"
+                        },
+                        "description": "Número de registros a omitir"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "description": "Número máximo de registros a retornar",
+                            "default": 100,
+                            "title": "Limit"
+                        },
+                        "description": "Número máximo de registros a retornar"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PedidosResponse"
+                                    },
+                                    "title": "Response Get Pedidos By Cliente Pedidos Cliente  Cliente Id  Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/pedidos/stats/resumen": {
+            "get": {
+                "tags": [
+                    "pedidos"
+                ],
+                "summary": "Get Pedidos Stats",
+                "description": "Obtener estadísticas resumidas de pedidos",
+                "operationId": "get_pedidos_stats_pedidos_stats_resumen_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/": {
+            "get": {
+                "summary": "Read Root",
+                "operationId": "read_root__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "summary": "Health Check",
+                "operationId": "health_check_health_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CategoriaCreate": {
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "title": "Nombre"
+                    },
+                    "descripcion": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Descripcion"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nombre"
+                ],
+                "title": "CategoriaCreate"
+            },
+            "CategoriaResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "title": "Nombre"
+                    },
+                    "descripcion": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Descripcion"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "nombre"
+                ],
+                "title": "CategoriaResponse"
+            },
+            "ClienteCreate": {
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "title": "Nombre"
+                    },
+                    "apellido": {
+                        "type": "string",
+                        "title": "Apellido"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "telefono": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Telefono"
+                    },
+                    "direccion": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Direccion"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nombre",
+                    "apellido",
+                    "email"
+                ],
+                "title": "ClienteCreate"
+            },
+            "ClienteResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "title": "Nombre"
+                    },
+                    "apellido": {
+                        "type": "string",
+                        "title": "Apellido"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "telefono": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Telefono"
+                    },
+                    "direccion": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Direccion"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "nombre",
+                    "apellido",
+                    "email"
+                ],
+                "title": "ClienteResponse"
+            },
+            "CuponCreate": {
+                "properties": {
+                    "codigo": {
+                        "type": "string",
+                        "title": "Codigo"
+                    },
+                    "tipoDescuento": {
+                        "type": "string",
+                        "title": "Tipodescuento"
+                    },
+                    "valorDescuento": {
+                        "type": "number",
+                        "title": "Valordescuento"
+                    },
+                    "validoDesde": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Validodesde"
+                    },
+                    "validoHasta": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Validohasta"
+                    },
+                    "limiteUso": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Limiteuso"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "codigo",
+                    "tipoDescuento",
+                    "valorDescuento"
+                ],
+                "title": "CuponCreate"
+            },
+            "CuponResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "title": "Codigo"
+                    },
+                    "tipoDescuento": {
+                        "type": "string",
+                        "title": "Tipodescuento"
+                    },
+                    "valorDescuento": {
+                        "type": "number",
+                        "title": "Valordescuento"
+                    },
+                    "validoDesde": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Validodesde"
+                    },
+                    "validoHasta": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Validohasta"
+                    },
+                    "limiteUso": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Limiteuso"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "codigo",
+                    "tipoDescuento",
+                    "valorDescuento"
+                ],
+                "title": "CuponResponse"
+            },
+            "EntidadCreate": {
+                "properties": {
+                    "tipoEntidad": {
+                        "type": "string",
+                        "title": "Tipoentidad"
+                    },
+                    "nombre": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Nombre"
+                    },
+                    "apellido": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Apellido"
+                    },
+                    "contacto": {
+                        "type": "string",
+                        "title": "Contacto"
+                    },
+                    "telefono": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Telefono"
+                    },
+                    "email": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Email"
+                    },
+                    "direccion": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Direccion"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "tipoEntidad",
+                    "contacto"
+                ],
+                "title": "EntidadCreate"
+            },
+            "EntidadResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "tipoEntidad": {
+                        "type": "string",
+                        "title": "Tipoentidad"
+                    },
+                    "nombre": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Nombre"
+                    },
+                    "apellido": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Apellido"
+                    },
+                    "contacto": {
+                        "type": "string",
+                        "title": "Contacto"
+                    },
+                    "telefono": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Telefono"
+                    },
+                    "email": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Email"
+                    },
+                    "direccion": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Direccion"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "tipoEntidad",
+                    "contacto"
+                ],
+                "title": "EntidadResponse"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "InventarioCreate": {
+                "properties": {
+                    "productoId": {
+                        "type": "integer",
+                        "title": "Productoid"
+                    },
+                    "cantidadStock": {
+                        "type": "integer",
+                        "title": "Cantidadstock"
+                    },
+                    "cantidadMinima": {
+                        "type": "integer",
+                        "title": "Cantidadminima",
+                        "default": 0
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "productoId",
+                    "cantidadStock"
+                ],
+                "title": "InventarioCreate"
+            },
+            "InventarioResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "productoId": {
+                        "type": "integer",
+                        "title": "Productoid"
+                    },
+                    "cantidadStock": {
+                        "type": "integer",
+                        "title": "Cantidadstock"
+                    },
+                    "cantidadMinima": {
+                        "type": "integer",
+                        "title": "Cantidadminima"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "productoId",
+                    "cantidadStock",
+                    "cantidadMinima"
+                ],
+                "title": "InventarioResponse"
+            },
+            "MetodoEnvioCreate": {
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "title": "Nombre"
+                    },
+                    "costo": {
+                        "type": "number",
+                        "title": "Costo"
+                    },
+                    "tiempoEstimadoEntrega": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Tiempoestimadoentrega"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nombre",
+                    "costo"
+                ],
+                "title": "MetodoEnvioCreate"
+            },
+            "MetodoEnvioResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "title": "Nombre"
+                    },
+                    "costo": {
+                        "type": "number",
+                        "title": "Costo"
+                    },
+                    "tiempoEstimadoEntrega": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Tiempoestimadoentrega"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "nombre",
+                    "costo"
+                ],
+                "title": "MetodoEnvioResponse"
+            },
+            "PedidosCreate": {
+                "properties": {
+                    "clienteId": {
+                        "type": "integer",
+                        "title": "Clienteid",
+                        "description": "ID del cliente que realiza el pedido"
+                    },
+                    "montoTotal": {
+                        "type": "number",
+                        "exclusiveMinimum": 0.0,
+                        "title": "Montototal",
+                        "description": "Monto total del pedido"
+                    },
+                    "estadoPedido": {
+                        "type": "string",
+                        "title": "Estadopedido",
+                        "description": "Estado del pedido",
+                        "default": "pendiente"
+                    },
+                    "estadoPago": {
+                        "type": "string",
+                        "title": "Estadopago",
+                        "description": "Estado del pago",
+                        "default": "pendiente"
+                    },
+                    "metodoPago": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Metodopago",
+                        "description": "Método de pago utilizado"
+                    },
+                    "direccionEnvio": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Direccionenvio",
+                        "description": "Dirección de envío"
+                    },
+                    "cuponId": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Cuponid",
+                        "description": "ID del cupón aplicado"
+                    },
+                    "metodoEnvioId": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Metodoenvioid",
+                        "description": "ID del método de envío"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "clienteId",
+                    "montoTotal"
+                ],
+                "title": "PedidosCreate",
+                "example": {
+                    "clienteId": 1,
+                    "cuponId": 1,
+                    "direccionEnvio": "Av. Principal 123, Ciudad",
+                    "estadoPago": "pendiente",
+                    "estadoPedido": "pendiente",
+                    "metodoEnvioId": 1,
+                    "metodoPago": "tarjeta_credito",
+                    "montoTotal": 45.99
+                }
+            },
+            "PedidosDetail": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "clienteId": {
+                        "type": "integer",
+                        "title": "Clienteid"
+                    },
+                    "montoTotal": {
+                        "type": "number",
+                        "title": "Montototal"
+                    },
+                    "estadoPedido": {
+                        "type": "string",
+                        "title": "Estadopedido"
+                    },
+                    "estadoPago": {
+                        "type": "string",
+                        "title": "Estadopago"
+                    },
+                    "metodoPago": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Metodopago"
+                    },
+                    "direccionEnvio": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Direccionenvio"
+                    },
+                    "cuponId": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Cuponid"
+                    },
+                    "metodoEnvioId": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Metodoenvioid"
+                    },
+                    "creadoEn": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Creadoen"
+                    },
+                    "cliente_nombre": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Cliente Nombre"
+                    },
+                    "cliente_email": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Cliente Email"
+                    },
+                    "cupon_codigo": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Cupon Codigo"
+                    },
+                    "metodo_envio_nombre": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Metodo Envio Nombre"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "clienteId",
+                    "montoTotal",
+                    "estadoPedido",
+                    "estadoPago",
+                    "creadoEn"
+                ],
+                "title": "PedidosDetail",
+                "description": "Schema detallado para pedidos con información relacionada"
+            },
+            "PedidosResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "clienteId": {
+                        "type": "integer",
+                        "title": "Clienteid"
+                    },
+                    "montoTotal": {
+                        "type": "number",
+                        "title": "Montototal"
+                    },
+                    "estadoPedido": {
+                        "type": "string",
+                        "title": "Estadopedido"
+                    },
+                    "estadoPago": {
+                        "type": "string",
+                        "title": "Estadopago"
+                    },
+                    "metodoPago": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Metodopago"
+                    },
+                    "direccionEnvio": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Direccionenvio"
+                    },
+                    "cuponId": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Cuponid"
+                    },
+                    "metodoEnvioId": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Metodoenvioid"
+                    },
+                    "creadoEn": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Creadoen"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "clienteId",
+                    "montoTotal",
+                    "estadoPedido",
+                    "estadoPago",
+                    "creadoEn"
+                ],
+                "title": "PedidosResponse"
+            },
+            "PedidosUpdate": {
+                "properties": {
+                    "montoTotal": {
+                        "anyOf": [
+                            {
+                                "type": "number",
+                                "exclusiveMinimum": 0.0
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Montototal",
+                        "description": "Monto total del pedido"
+                    },
+                    "estadoPedido": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Estadopedido",
+                        "description": "Estado del pedido: pendiente, procesando, enviado, entregado, cancelado"
+                    },
+                    "estadoPago": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Estadopago",
+                        "description": "Estado del pago: pendiente, pagado, fallido, reembolsado"
+                    },
+                    "metodoPago": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Metodopago",
+                        "description": "Método de pago utilizado"
+                    },
+                    "direccionEnvio": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Direccionenvio",
+                        "description": "Dirección de envío"
+                    },
+                    "cuponId": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Cuponid",
+                        "description": "ID del cupón aplicado"
+                    },
+                    "metodoEnvioId": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Metodoenvioid",
+                        "description": "ID del método de envío"
+                    }
+                },
+                "type": "object",
+                "title": "PedidosUpdate",
+                "example": {
+                    "estadoPago": "pagado",
+                    "estadoPedido": "procesando",
+                    "metodoPago": "transferencia_bancaria"
+                }
+            },
+            "ProductoCreate": {
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "title": "Nombre"
+                    },
+                    "descripcion": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Descripcion"
+                    },
+                    "precio": {
+                        "type": "number",
+                        "title": "Precio"
+                    },
+                    "categoriaId": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Categoriaid"
+                    },
+                    "imagenUrl": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Imagenurl"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nombre",
+                    "precio"
+                ],
+                "title": "ProductoCreate"
+            },
+            "ProductoResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "title": "Nombre"
+                    },
+                    "descripcion": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Descripcion"
+                    },
+                    "precio": {
+                        "type": "number",
+                        "title": "Precio"
+                    },
+                    "categoriaId": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Categoriaid"
+                    },
+                    "imagenUrl": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Imagenurl"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "nombre",
+                    "precio"
+                ],
+                "title": "ProductoResponse"
+            },
+            "SedeCreate": {
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "title": "Nombre"
+                    },
+                    "direccion": {
+                        "type": "string",
+                        "title": "Direccion"
+                    },
+                    "telefono": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Telefono"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nombre",
+                    "direccion"
+                ],
+                "title": "SedeCreate"
+            },
+            "SedeResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "title": "Nombre"
+                    },
+                    "direccion": {
+                        "type": "string",
+                        "title": "Direccion"
+                    },
+                    "telefono": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Telefono"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "nombre",
+                    "direccion"
+                ],
+                "title": "SedeResponse"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    }
+}

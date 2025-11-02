@@ -1,3 +1,6 @@
+"use client"
+
+import { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -7,63 +10,73 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-
-// Mock data type for demo purposes
-interface OrderSummary {
-  id: string;
-  customer: string;
-  amount: string;
-  status: string;
-  date?: string;
-}
+import { Button } from "@/components/ui/button";
+import { PedidosResponse, PedidosDetail, EstadoPedido, EstadoPago } from "@/types/shop";
+import { orderService } from '@/services';
 
 interface OrdersTableProps {
-  orders?: OrderSummary[];
+  orders?: PedidosResponse[];
   title?: string;
   showActions?: boolean;
+  onOrderUpdate?: () => void;
 }
 
-const mockOrders: OrderSummary[] = [
+// Mock data for fallback
+const mockOrders: PedidosResponse[] = [
   { 
-    id: '#1001', 
-    customer: 'Sarah Johnson', 
-    amount: '$89.99', 
-    status: 'Processing',
-    date: '2024-11-01'
+    id: 1001, 
+    clienteId: 1,
+    montoTotal: 89.99,
+    estadoPedido: 'procesando',
+    estadoPago: 'pagado',
+    metodoPago: 'tarjeta_credito',
+    direccionEnvio: 'Av. Principal 123',
+    creadoEn: '2024-11-01T10:00:00Z'
   },
   { 
-    id: '#1002', 
-    customer: 'Mike Chen', 
-    amount: '$124.50', 
-    status: 'Shipped',
-    date: '2024-10-31'
+    id: 1002, 
+    clienteId: 2,
+    montoTotal: 124.50,
+    estadoPedido: 'enviado',
+    estadoPago: 'pagado',
+    metodoPago: 'transferencia',
+    direccionEnvio: 'Calle Secundaria 456',
+    creadoEn: '2024-10-31T15:30:00Z'
   },
   { 
-    id: '#1003', 
-    customer: 'Emma Davis', 
-    amount: '$67.25', 
-    status: 'Delivered',
-    date: '2024-10-30'
+    id: 1003, 
+    clienteId: 3,
+    montoTotal: 67.25,
+    estadoPedido: 'entregado',
+    estadoPago: 'pagado',
+    metodoPago: 'efectivo',
+    direccionEnvio: 'Plaza Central 789',
+    creadoEn: '2024-10-30T09:15:00Z'
   },
   { 
-    id: '#1004', 
-    customer: 'Alex Brown', 
-    amount: '$156.75', 
-    status: 'Processing',
-    date: '2024-10-30'
+    id: 1004, 
+    clienteId: 4,
+    montoTotal: 156.75,
+    estadoPedido: 'pendiente',
+    estadoPago: 'pendiente',
+    metodoPago: 'tarjeta_debito',
+    direccionEnvio: 'Barrio Norte 321',
+    creadoEn: '2024-10-30T14:45:00Z'
   },
 ];
 
 const getStatusVariant = (status: string) => {
   switch (status.toLowerCase()) {
-    case 'delivered':
+    case 'entregado':
       return 'default'; // Green
-    case 'shipped':
+    case 'enviado':
       return 'secondary'; // Blue
-    case 'processing':
+    case 'procesando':
       return 'outline'; // Yellow/Orange
-    case 'cancelled':
+    case 'cancelado':
       return 'destructive'; // Red
+    case 'pendiente':
+      return 'outline'; // Gray
     default:
       return 'outline';
   }
@@ -71,84 +84,185 @@ const getStatusVariant = (status: string) => {
 
 const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
-    case 'delivered':
+    case 'entregado':
       return 'bg-green-100 text-green-800 hover:bg-green-100';
-    case 'shipped':
+    case 'enviado':
       return 'bg-blue-100 text-blue-800 hover:bg-blue-100';
-    case 'processing':
+    case 'procesando':
       return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100';
-    case 'cancelled':
+    case 'cancelado':
       return 'bg-red-100 text-red-800 hover:bg-red-100';
+    case 'pendiente':
+      return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
     default:
       return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
   }
 };
 
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP'
+  }).format(amount);
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('es-CO', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+const getStatusLabel = (status: string) => {
+  const labels: Record<string, string> = {
+    'pendiente': 'Pendiente',
+    'procesando': 'Procesando',
+    'enviado': 'Enviado',
+    'entregado': 'Entregado',
+    'cancelado': 'Cancelado'
+  };
+  return labels[status.toLowerCase()] || status;
+};
+
 export default function OrdersTable({
-  orders = mockOrders,
-  title = "Recent Orders",
-  showActions = false
+  orders,
+  title = "Pedidos Recientes",
+  showActions = false,
+  onOrderUpdate
 }: OrdersTableProps) {
+  const [loadingOrders, setLoadingOrders] = useState(!orders);
+  const [ordersData, setOrdersData] = useState<PedidosResponse[]>(orders || []);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch orders if not provided as props
+  useEffect(() => {
+    if (!orders) {
+      const fetchOrders = async () => {
+        try {
+          setLoadingOrders(true);
+          setError(null);
+          const fetchedOrders = await orderService.getRecentPedidos();
+          setOrdersData(fetchedOrders);
+        } catch (err: any) {
+          console.error('Failed to fetch orders:', err);
+          setError('Failed to load orders');
+          // Fallback to mock data
+          setOrdersData(mockOrders);
+        } finally {
+          setLoadingOrders(false);
+        }
+      };
+
+      fetchOrders();
+    }
+  }, [orders]);
+
+  const handleStatusUpdate = async (orderId: number, newStatus: string) => {
+    try {
+      await orderService.updatePedidoEstado(orderId, { estado_pedido: newStatus });
+      
+      // Update local state
+      setOrdersData(prevOrders => 
+        prevOrders.map(order => 
+          order.id === orderId 
+            ? { ...order, estadoPedido: newStatus }
+            : order
+        )
+      );
+      
+      // Call parent callback if provided
+      onOrderUpdate?.();
+    } catch (err: any) {
+      console.error('Failed to update order status:', err);
+      setError('Failed to update order status');
+    }
+  };
+
+  if (loadingOrders) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        </div>
+        <div className="p-8 text-center">
+          <div className="text-gray-500">Cargando pedidos...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-sm border">
       <div className="px-6 py-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        {error && (
+          <p className="text-sm text-red-600 mt-1">{error}</p>
+        )}
       </div>
       <div className="overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Order ID</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead className="text-center w-[120px]">Status</TableHead>
-              {showActions && <TableHead className="text-right">Actions</TableHead>}
+              <TableHead className="w-[100px]">Pedido #</TableHead>
+              <TableHead>Cliente ID</TableHead>
+              <TableHead className="text-right">Monto</TableHead>
+              <TableHead className="text-center w-[120px]">Estado</TableHead>
+              <TableHead className="text-center w-[100px]">Fecha</TableHead>
+              {showActions && <TableHead className="text-right">Acciones</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
+            {ordersData.map((order) => (
               <TableRow 
                 key={order.id}
                 className="hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 <TableCell className="font-medium text-gray-900">
-                  {order.id}
+                  #{order.id}
                 </TableCell>
                 <TableCell className="text-gray-700">
-                  {order.customer}
+                  Cliente {order.clienteId}
                 </TableCell>
                 <TableCell className="text-right font-semibold text-gray-900">
-                  {order.amount}
+                  {formatCurrency(order.montoTotal)}
                 </TableCell>
                 <TableCell className="text-center">
                   <Badge 
-                    variant={getStatusVariant(order.status)}
-                    className={getStatusColor(order.status)}
+                    variant={getStatusVariant(order.estadoPedido)}
+                    className={getStatusColor(order.estadoPedido)}
                   >
-                    {order.status}
+                    {getStatusLabel(order.estadoPedido)}
                   </Badge>
+                </TableCell>
+                <TableCell className="text-center text-sm text-gray-500">
+                  {formatDate(order.creadoEn)}
                 </TableCell>
                 {showActions && (
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
-                      <button 
-                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           console.log('View order:', order.id);
                         }}
                       >
-                        View
-                      </button>
-                      <button 
-                        className="text-sm text-gray-600 hover:text-gray-800 font-medium"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log('Edit order:', order.id);
-                        }}
-                      >
-                        Edit
-                      </button>
+                        Ver
+                      </Button>
+                      {order.estadoPedido === 'pendiente' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleStatusUpdate(order.id, 'procesando');
+                          }}
+                        >
+                          Procesar
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 )}
@@ -160,9 +274,14 @@ export default function OrdersTable({
       
       {/* Show more link */}
       <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
-        <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-          View all orders →
-        </button>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="text-blue-600 hover:text-blue-800"
+          onClick={() => console.log('View all orders')}
+        >
+          Ver todos los pedidos →
+        </Button>
       </div>
     </div>
   );

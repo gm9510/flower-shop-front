@@ -1,33 +1,148 @@
-// Flower and Product Types
-export interface Flower {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: FlowerCategory;
-  images: string[];
-  inStock: boolean;
-  stockQuantity: number;
-  colors: string[];
-  occasions: string[];
-  createdAt: Date;
-  updatedAt: Date;
+// Product Types (based on backend ProductoResponse)
+export interface Producto {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  precio: number;
+  categoriaId?: number;
+  imagenUrl?: string;
 }
 
-export interface FlowerCategory {
-  id: string;
-  name: string;
-  description: string;
-  image?: string;
+export interface ProductoCreate {
+  nombre: string;
+  descripcion?: string;
+  precio: number;
+  categoriaId?: number;
+  imagenUrl?: string;
 }
 
-// Cart Types
+// Category Types (based on backend CategoriaResponse)
+export interface Categoria {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+}
+
+export interface CategoriaCreate {
+  nombre: string;
+  descripcion?: string;
+}
+
+// Order Types (based on backend schemas)
+export interface PedidosResponse {
+  id: number;
+  clienteId: number;
+  montoTotal: number;
+  estadoPedido: string;
+  estadoPago: string;
+  metodoPago?: string;
+  direccionEnvio?: string;
+  cuponId?: number;
+  metodoEnvioId?: number;
+  creadoEn: string; // ISO date string
+}
+
+export interface PedidosDetail extends PedidosResponse {
+  cliente_nombre?: string;
+  cliente_email?: string;
+  cupon_codigo?: string;
+  metodo_envio_nombre?: string;
+}
+
+export interface PedidosCreate {
+  clienteId: number;
+  montoTotal: number;
+  estadoPedido?: string;
+  estadoPago?: string;
+  metodoPago?: string;
+  direccionEnvio?: string;
+  cuponId?: number;
+  metodoEnvioId?: number;
+}
+
+export interface PedidosUpdate {
+  montoTotal?: number;
+  estadoPedido?: string;
+  estadoPago?: string;
+  metodoPago?: string;
+  direccionEnvio?: string;
+  cuponId?: number;
+  metodoEnvioId?: number;
+}
+
+// Order Status Enums
+export enum EstadoPedido {
+  PENDIENTE = 'pendiente',
+  PROCESANDO = 'procesando',
+  ENVIADO = 'enviado',
+  ENTREGADO = 'entregado',
+  CANCELADO = 'cancelado'
+}
+
+export enum EstadoPago {
+  PENDIENTE = 'pendiente',
+  PAGADO = 'pagado',
+  FALLIDO = 'fallido',
+  REEMBOLSADO = 'reembolsado'
+}
+
+// Client Types (based on backend ClienteResponse)
+export interface Cliente {
+  id: number;
+  nombre: string;
+  apellido: string;
+  email: string;
+  telefono?: string;
+  direccion?: string;
+  fechaNacimiento?: string;
+  creadoEn: string;
+}
+
+export interface ClienteCreate {
+  nombre: string;
+  apellido: string;
+  email: string;
+  telefono?: string;
+  direccion?: string;
+  fechaNacimiento?: string;
+}
+
+// Inventory Types
+export interface Inventario {
+  id: number;
+  productoId: number;
+  cantidadStock: number;
+  cantidadMinima: number;
+  fechaUltimaActualizacion: string;
+}
+
+// Coupon Types
+export interface Cupon {
+  id: number;
+  codigo: string;
+  tipoDescuento: string;
+  valorDescuento: number;
+  fechaInicio: string;
+  fechaVencimiento: string;
+  activo: boolean;
+  creadoEn: string;
+}
+
+// Shipping Method Types
+export interface MetodoEnvio {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  costo: number;
+  tiempoEstimado?: string;
+}
+
+// Cart Types (for frontend use)
 export interface CartItem {
   id: string;
-  flower: Flower;
+  producto: Producto;
   quantity: number;
-  selectedColor?: string;
-  customMessage?: string;
+  selectedOptions?: Record<string, any>;
 }
 
 export interface Cart {
@@ -36,53 +151,20 @@ export interface Cart {
   itemCount: number;
 }
 
-// Order Types
-export interface Order {
-  id: string;
-  customerId: string;
-  items: CartItem[];
-  total: number;
-  status: OrderStatus;
-  shippingAddress: Address;
-  billingAddress?: Address;
-  paymentMethod: PaymentMethod;
-  deliveryDate: Date;
-  specialInstructions?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export enum OrderStatus {
-  PENDING = 'pending',
-  CONFIRMED = 'confirmed',
-  PREPARING = 'preparing',
-  OUT_FOR_DELIVERY = 'out_for_delivery',
-  DELIVERED = 'delivered',
-  CANCELLED = 'cancelled'
-}
-
-export interface Address {
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-}
-
-export interface PaymentMethod {
-  type: 'credit_card' | 'debit_card' | 'paypal' | 'cash_on_delivery';
-  cardLast4?: string;
-  cardBrand?: string;
-}
-
-// Customer Types
-export interface Customer {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone?: string;
-  addresses: Address[];
-  orders: Order[];
-  createdAt: Date;
+// Stats Types
+export interface PedidosStats {
+  total_pedidos: number;
+  monto_total_pagado: number;
+  estados_pago: {
+    completados: number;
+    fallidos: number;
+    pendientes: number;
+  };
+  estados_pedido: {
+    cancelados: number;
+    entregados: number;
+    enviados: number;
+    pendientes: number;
+    procesando: number;
+  };
 }
