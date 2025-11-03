@@ -170,7 +170,7 @@ export default function CreateOrderForm({ onSuccess, onCancel }: CreateOrderForm
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="montoTotal">Monto Total (COP) *</Label>
+            <Label htmlFor="montoTotal" className='pb-2'>Monto Total (COP) *</Label>
             <Input
               id="montoTotal"
               type="number"
@@ -183,9 +183,8 @@ export default function CreateOrderForm({ onSuccess, onCancel }: CreateOrderForm
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="estadoPedido">Estado del Pedido</Label>
+              <Label htmlFor="estadoPedido" className='pb-2'>Estado del Pedido</Label>
               <Select onValueChange={(value: string) => setValue('estadoPedido', value as any)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar estado" />
@@ -201,7 +200,7 @@ export default function CreateOrderForm({ onSuccess, onCancel }: CreateOrderForm
             </div>
 
             <div>
-              <Label htmlFor="estadoPago">Estado del Pago</Label>
+              <Label htmlFor="estadoPago" className='pb-2'>Estado del Pago</Label>
               <Select onValueChange={(value: string) => setValue('estadoPago', value as any)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar estado" />
@@ -214,10 +213,9 @@ export default function CreateOrderForm({ onSuccess, onCancel }: CreateOrderForm
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
           <div>
-            <Label htmlFor="metodoPago">Método de Pago</Label>
+            <Label htmlFor="metodoPago" className='pb-2'>Método de Pago</Label>
             <Select onValueChange={(value: string) => setValue('metodoPago', value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Seleccionar método de pago" />
@@ -244,7 +242,7 @@ export default function CreateOrderForm({ onSuccess, onCancel }: CreateOrderForm
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="metodoEnvioId">Método de Envío</Label>
+            <Label htmlFor="metodoEnvioId" className='pb-2'>Método de Envío</Label>
             <Select onValueChange={(value: string) => setValue('metodoEnvioId', parseInt(value))}>
               <SelectTrigger>
                 <SelectValue placeholder="Seleccionar método de envío" />
@@ -260,7 +258,7 @@ export default function CreateOrderForm({ onSuccess, onCancel }: CreateOrderForm
           </div>
 
           <div>
-            <Label htmlFor="cuponId">Cupón de Descuento</Label>
+            <Label htmlFor="cuponId" className='pb-2'>Cupón de Descuento</Label>
             <Select onValueChange={(value: string) => setValue('cuponId', parseInt(value))}>
               <SelectTrigger>
                 <SelectValue placeholder="Seleccionar cupón (opcional)" />

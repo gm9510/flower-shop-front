@@ -50,14 +50,14 @@ export default function CreateOrderDrawer({ children }: CreateOrderDrawerProps) 
           </Button>
         )}
       </DrawerTrigger>
-      <DrawerContent className="max-h-[90vh]">
+      <DrawerContent className="max-h-[100vh]">
         <DrawerHeader>
           <DrawerTitle>Crear Nuevo Pedido</DrawerTitle>
           <DrawerDescription>
             Complete la información necesaria para crear un nuevo pedido en el sistema.
           </DrawerDescription>
         </DrawerHeader>
-        <div className="px-4 pb-4 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className="px-4 pb-4 overflow-y-auto max-h-[100vh]">
           <CreateOrderForm
             onSuccess={handleSuccess}
             onCancel={handleCancel}

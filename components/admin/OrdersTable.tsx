@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Table,
   TableBody,
@@ -131,6 +132,7 @@ export default function OrdersTable({
   showActions = false,
   onOrderUpdate
 }: OrdersTableProps) {
+  const router = useRouter();
   const [loadingOrders, setLoadingOrders] = useState(!orders);
   const [ordersData, setOrdersData] = useState<PedidosResponse[]>(orders || []);
   const [error, setError] = useState<string | null>(null);
@@ -278,7 +280,7 @@ export default function OrdersTable({
           variant="ghost" 
           size="sm"
           className="text-blue-600 hover:text-blue-800"
-          onClick={() => console.log('View all orders')}
+          onClick={() => router.push('/admin/orders')}
         >
           Ver todos los pedidos →
         </Button>
