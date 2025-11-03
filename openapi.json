@@ -1244,6 +1244,425 @@
                 }
             }
         },
+        "/item-pedido/": {
+            "get": {
+                "tags": [
+                    "items-pedido"
+                ],
+                "summary": "Get Items Pedido",
+                "description": "Obtener lista de items de pedido con filtros opcionales y paginación.",
+                "operationId": "get_items_pedido_item_pedido__get",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Número de registros a saltar",
+                            "default": 0,
+                            "title": "Skip"
+                        },
+                        "description": "Número de registros a saltar"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "description": "Número máximo de registros a devolver",
+                            "default": 100,
+                            "title": "Limit"
+                        },
+                        "description": "Número máximo de registros a devolver"
+                    },
+                    {
+                        "name": "pedido_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "integer"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Filtrar por ID de pedido",
+                            "title": "Pedido Id"
+                        },
+                        "description": "Filtrar por ID de pedido"
+                    },
+                    {
+                        "name": "producto_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "integer"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Filtrar por ID de producto",
+                            "title": "Producto Id"
+                        },
+                        "description": "Filtrar por ID de producto"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ItemsPedidoResponse"
+                                    },
+                                    "title": "Response Get Items Pedido Item Pedido  Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "items-pedido"
+                ],
+                "summary": "Create Item Pedido",
+                "description": "Crear un nuevo ítem en un pedido.",
+                "operationId": "create_item_pedido_item_pedido__post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ItemsPedidoCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItemsPedidoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/item-pedido/{item_id}": {
+            "get": {
+                "tags": [
+                    "items-pedido"
+                ],
+                "summary": "Get Item Pedido",
+                "description": "Obtener un ítem de pedido específico con detalles del pedido y producto.",
+                "operationId": "get_item_pedido_item_pedido__item_id__get",
+                "parameters": [
+                    {
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Item Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItemsPedidoDetail"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "items-pedido"
+                ],
+                "summary": "Update Item Pedido",
+                "description": "Actualizar completamente un ítem de pedido.",
+                "operationId": "update_item_pedido_item_pedido__item_id__put",
+                "parameters": [
+                    {
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Item Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ItemsPedidoCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItemsPedidoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "items-pedido"
+                ],
+                "summary": "Patch Item Pedido",
+                "description": "Actualizar parcialmente un ítem de pedido.",
+                "operationId": "patch_item_pedido_item_pedido__item_id__patch",
+                "parameters": [
+                    {
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Item Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ItemsPedidoUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItemsPedidoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "items-pedido"
+                ],
+                "summary": "Delete Item Pedido",
+                "description": "Eliminar un ítem de pedido.",
+                "operationId": "delete_item_pedido_item_pedido__item_id__delete",
+                "parameters": [
+                    {
+                        "name": "item_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Item Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/item-pedido/pedido/{pedido_id}": {
+            "get": {
+                "tags": [
+                    "items-pedido"
+                ],
+                "summary": "Get Items By Pedido",
+                "description": "Obtener todos los ítems de un pedido específico.",
+                "operationId": "get_items_by_pedido_item_pedido_pedido__pedido_id__get",
+                "parameters": [
+                    {
+                        "name": "pedido_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Pedido Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ItemsPedidoDetail"
+                                    },
+                                    "title": "Response Get Items By Pedido Item Pedido Pedido  Pedido Id  Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/item-pedido/producto/{producto_id}": {
+            "get": {
+                "tags": [
+                    "items-pedido"
+                ],
+                "summary": "Get Items By Producto",
+                "description": "Obtener todos los ítems de pedido que contienen un producto específico.",
+                "operationId": "get_items_by_producto_item_pedido_producto__producto_id__get",
+                "parameters": [
+                    {
+                        "name": "producto_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Producto Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ItemsPedidoDetail"
+                                    },
+                                    "title": "Response Get Items By Producto Item Pedido Producto  Producto Id  Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/": {
             "get": {
                 "summary": "Read Root",
@@ -1762,6 +2181,199 @@
                     "cantidadMinima"
                 ],
                 "title": "InventarioResponse"
+            },
+            "ItemsPedidoCreate": {
+                "properties": {
+                    "pedidoId": {
+                        "type": "integer",
+                        "title": "Pedidoid",
+                        "description": "ID del pedido al que pertenece este ítem"
+                    },
+                    "productoId": {
+                        "type": "integer",
+                        "title": "Productoid",
+                        "description": "ID del producto"
+                    },
+                    "cantidad": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0.0,
+                        "title": "Cantidad",
+                        "description": "Cantidad del producto en el pedido"
+                    },
+                    "precioUnitario": {
+                        "type": "number",
+                        "exclusiveMinimum": 0.0,
+                        "title": "Preciounitario",
+                        "description": "Precio unitario del producto"
+                    },
+                    "subtotal": {
+                        "type": "number",
+                        "exclusiveMinimum": 0.0,
+                        "title": "Subtotal",
+                        "description": "Subtotal calculado (cantidad * precioUnitario)"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "pedidoId",
+                    "productoId",
+                    "cantidad",
+                    "precioUnitario",
+                    "subtotal"
+                ],
+                "title": "ItemsPedidoCreate",
+                "example": {
+                    "cantidad": 3,
+                    "pedidoId": 1,
+                    "precioUnitario": 25.5,
+                    "productoId": 5,
+                    "subtotal": 76.5
+                }
+            },
+            "ItemsPedidoDetail": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "pedidoId": {
+                        "type": "integer",
+                        "title": "Pedidoid"
+                    },
+                    "productoId": {
+                        "type": "integer",
+                        "title": "Productoid"
+                    },
+                    "cantidad": {
+                        "type": "integer",
+                        "title": "Cantidad"
+                    },
+                    "precioUnitario": {
+                        "type": "number",
+                        "title": "Preciounitario"
+                    },
+                    "subtotal": {
+                        "type": "number",
+                        "title": "Subtotal"
+                    },
+                    "pedido": {
+                        "anyOf": [
+                            {
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Pedido",
+                        "description": "Información básica del pedido"
+                    },
+                    "producto": {
+                        "anyOf": [
+                            {
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Producto",
+                        "description": "Información básica del producto"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "pedidoId",
+                    "productoId",
+                    "cantidad",
+                    "precioUnitario",
+                    "subtotal"
+                ],
+                "title": "ItemsPedidoDetail"
+            },
+            "ItemsPedidoResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "pedidoId": {
+                        "type": "integer",
+                        "title": "Pedidoid"
+                    },
+                    "productoId": {
+                        "type": "integer",
+                        "title": "Productoid"
+                    },
+                    "cantidad": {
+                        "type": "integer",
+                        "title": "Cantidad"
+                    },
+                    "precioUnitario": {
+                        "type": "number",
+                        "title": "Preciounitario"
+                    },
+                    "subtotal": {
+                        "type": "number",
+                        "title": "Subtotal"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "pedidoId",
+                    "productoId",
+                    "cantidad",
+                    "precioUnitario",
+                    "subtotal"
+                ],
+                "title": "ItemsPedidoResponse"
+            },
+            "ItemsPedidoUpdate": {
+                "properties": {
+                    "cantidad": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "exclusiveMinimum": 0.0
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Cantidad",
+                        "description": "Nueva cantidad del producto"
+                    },
+                    "precioUnitario": {
+                        "anyOf": [
+                            {
+                                "type": "number",
+                                "exclusiveMinimum": 0.0
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Preciounitario",
+                        "description": "Nuevo precio unitario"
+                    },
+                    "subtotal": {
+                        "anyOf": [
+                            {
+                                "type": "number",
+                                "exclusiveMinimum": 0.0
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Subtotal",
+                        "description": "Nuevo subtotal calculado"
+                    }
+                },
+                "type": "object",
+                "title": "ItemsPedidoUpdate"
             },
             "MetodoEnvioCreate": {
                 "properties": {
