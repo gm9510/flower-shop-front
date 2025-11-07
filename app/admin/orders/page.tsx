@@ -6,6 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import SearchAndFilter from '@/components/admin/orders/SearchAndFilter';
 import PageHeader from '@/components/admin/orders/PageHeader';
 import OrdersTable from '@/components/admin/orders/Table';
+import ViewOrderDrawer from '@/components/admin/ViewOrderDrawer';
+import EditOrderDrawer from '@/components/admin/EditOrderDrawer';
 import { orderService } from '@/services/api/orders';
 import type { PedidosResponse } from '@/types/shop';
 import { useRouter } from 'next/navigation';
@@ -23,6 +25,12 @@ export default function OrdersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // Drawer states
+  const [viewOrderId, setViewOrderId] = useState<number | null>(null);
+  const [isViewDrawerOpen, setIsViewDrawerOpen] = useState(false);
+  const [editOrderId, setEditOrderId] = useState<number | null>(null);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 
   // Fetch orders function
   const fetchOrders = async (page = 1) => {
@@ -99,13 +107,18 @@ export default function OrdersPage() {
   };
 
   const handleViewOrder = (orderId: number) => {
-    console.log('View order:', orderId);
-    // TODO: Navigate to order detail page or open modal
+    setViewOrderId(orderId);
+    setIsViewDrawerOpen(true);
   };
 
   const handleEditOrder = (orderId: number) => {
-    console.log('Edit order:', orderId);
-    // TODO: Navigate to order edit page or open modal
+    setEditOrderId(orderId);
+    setIsEditDrawerOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    // Refresh orders list after successful edit
+    fetchOrders(currentPage);
   };
   return (
     <div className="min-h-screen bg-gray-100">
@@ -150,6 +163,21 @@ export default function OrdersPage() {
           onViewOrder={handleViewOrder}
           onEditOrder={handleEditOrder}
           onPageChange={handlePageChange}
+        />
+
+        {/* View Order Drawer */}
+        <ViewOrderDrawer
+          orderId={viewOrderId}
+          isOpen={isViewDrawerOpen}
+          onClose={() => setIsViewDrawerOpen(false)}
+        />
+
+        {/* Edit Order Drawer */}
+        <EditOrderDrawer
+          orderId={editOrderId}
+          isOpen={isEditDrawerOpen}
+          onClose={() => setIsEditDrawerOpen(false)}
+          onSuccess={handleEditSuccess}
         />
       </div>
     </div>
