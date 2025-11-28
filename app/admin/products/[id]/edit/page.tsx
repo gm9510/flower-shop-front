@@ -24,6 +24,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import Header from '@/components/layout/header';
 import { productService, categoryService, productAssemblyService } from '@/services';
 import type { Producto, Categoria, ProductoUpdate } from '@/types/shop';
 import type { ProductoEnsamble, ProductoEnsambleCreate } from '@/services/api/product-assemblies';
@@ -277,9 +278,14 @@ export default function EditProductPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gray-100">
+      {/* Admin Header */}
+      <Header />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={() => router.push(`/admin/products/${productId}`)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -549,6 +555,8 @@ export default function EditProductPage() {
               <p>• Los cambios se guardarán al hacer clic en "Guardar Cambios"</p>
             </CardContent>
           </Card>
+        </div>
+      </div>
         </div>
       </div>
     </div>

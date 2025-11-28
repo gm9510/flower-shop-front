@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import Header from '@/components/layout/header';
 import { productService, categoryService } from '@/services';
 import type { Categoria, ProductoCreate } from '@/types/shop';
 
@@ -100,9 +101,14 @@ export default function CreateProductPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gray-100">
+      {/* Admin Header */}
+      <Header />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={handleCancel}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -282,6 +288,8 @@ export default function CreateProductPage() {
               <p>• Los cambios se guardarán al hacer clic en "Crear Producto"</p>
             </CardContent>
           </Card>
+        </div>
+      </div>
         </div>
       </div>
     </div>

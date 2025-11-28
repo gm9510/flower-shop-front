@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Header from '@/components/layout/header';
 import { productService, categoryService } from '@/services';
 import type { Producto, Categoria } from '@/types/shop';
 
@@ -105,9 +106,14 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gray-100">
+      {/* Admin Header */}
+      <Header />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Productos</h1>
           <p className="text-muted-foreground mt-1">
@@ -238,6 +244,8 @@ export default function ProductsPage() {
           Mostrando {filteredProducts.length} de {products.length} productos
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 }

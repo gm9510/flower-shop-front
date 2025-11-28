@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import Header from '@/components/layout/header';
 import { productService, categoryService, productAssemblyService } from '@/services';
 import type { Producto, Categoria } from '@/types/shop';
 import type { ProductoEnsamble } from '@/services/api/product-assemblies';
@@ -139,9 +140,14 @@ export default function ProductDetailsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gray-100">
+      {/* Admin Header */}
+      <Header />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={() => router.push('/admin/products')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -363,6 +369,8 @@ export default function ProductDetailsPage() {
               </Button>
             </CardContent>
           </Card>
+        </div>
+      </div>
         </div>
       </div>
     </div>
