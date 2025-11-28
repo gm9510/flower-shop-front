@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, Save, User, CreditCard, Truck, Tag, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, User, CreditCard, Truck, Tag, Loader2, Package, Plus, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,16 +18,20 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { orderService } from '@/services/api/orders';
 import { clientService } from '@/services/api/clients';
 import { couponService } from '@/services/api/coupons';
 import { shippingService } from '@/services/api/shipping';
+import { orderItemService, type PedidoDetalle } from '@/services/api/order-items';
+import { productService } from '@/services/api/products';
 import type {
   PedidosUpdate,
   PedidosResponse,
   Cliente,
   Cupon,
   MetodoEnvio,
+  Producto,
 } from '@/types/shop';
 
 // Form validation schema
@@ -58,6 +62,17 @@ export default function EditOrderPage() {
   const [shippingMethods, setShippingMethods] = useState<MetodoEnvio[]>([]);
   const [order, setOrder] = useState<PedidosResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Order Items Management
+  const [orderItems, setOrderItems] = useState<PedidoDetalle[]>([]);
+  const [deletedItemIds, setDeletedItemIds] = useState<number[]>([]);
+  const [products, setProducts] = useState<Producto[]>([]);
+  const [showAddItem, setShowAddItem] = useState(false);
+  const [newItem, setNewItem] = useState({
+    productoId: 0,
+    cantidad: 1,
+    precioUnitario: 0,
+  });
 
   const {
     register,
@@ -98,16 +113,20 @@ export default function EditOrderPage() {
         orderData.fechaEnvio ? orderData.fechaEnvio.split('T')[0] : ''
       );
 
-      // Load dropdown data
-      const [clientsData, couponsData, shippingData] = await Promise.all([
+      // Load dropdown data and order items
+      const [clientsData, couponsData, shippingData, itemsData, productsData] = await Promise.all([
         clientService.getClientes({ limit: 100 }),
         couponService.getCupones(),
         shippingService.getMetodosEnvio(),
+        orderItemService.getItemsByPedido(orderId),
+        productService.getProductos({ limit: 500 }),
       ]);
 
       setClients(clientsData);
       setCoupons(couponsData);
       setShippingMethods(shippingData);
+      setOrderItems(itemsData);
+      setProducts(productsData);
     } catch (error) {
       console.error('Error loading data:', error);
       setError('No se pudo cargar la información del pedido');
@@ -133,7 +152,27 @@ export default function EditOrderPage() {
         updateData.metodoEnvioId = data.metodoEnvioId;
       if (data.fechaEnvio !== undefined) updateData.fechaEnvio = data.fechaEnvio;
 
+      // Update order
       await orderService.updatePedido(orderId, updateData);
+
+      // Delete removed items
+      await Promise.all(
+        deletedItemIds.map((itemId) => orderItemService.deletePedidoDetalle(itemId))
+      );
+
+      // Update existing items (quantities or prices)
+      const updatePromises = orderItems
+        .filter((item) => item.id && !deletedItemIds.includes(item.id))
+        .map((item) =>
+          orderItemService.updatePedidoDetalle(item.id, {
+            cantidad: item.cantidad,
+            precioUnitario: item.precioUnitario,
+            subtotal: item.subtotal,
+          })
+        );
+
+      await Promise.all(updatePromises);
+
       router.push('/admin/orders');
     } catch (error) {
       console.error('Error updating order:', error);
@@ -141,6 +180,89 @@ export default function EditOrderPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleAddItem = async () => {
+    if (!newItem.productoId || newItem.cantidad <= 0) {
+      setError('Por favor selecciona un producto y una cantidad válida');
+      return;
+    }
+
+    try {
+      const product = products.find((p) => p.id === newItem.productoId);
+      if (!product) return;
+
+      // Create the new item in the database
+      const createdItem = await orderItemService.createPedidoDetalle({
+        pedidoId: orderId,
+        productoId: newItem.productoId,
+        cantidad: newItem.cantidad,
+        precioUnitario: newItem.precioUnitario || product.precio,
+        subtotal: newItem.cantidad * (newItem.precioUnitario || product.precio),
+      });
+
+      // Add to local state
+      setOrderItems([...orderItems, createdItem]);
+
+      // Reset form
+      setNewItem({ productoId: 0, cantidad: 1, precioUnitario: 0 });
+      setShowAddItem(false);
+
+      // Recalculate total
+      recalculateTotal([...orderItems, createdItem]);
+    } catch (error) {
+      console.error('Error adding item:', error);
+      setError('Error al agregar el producto');
+    }
+  };
+
+  const handleRemoveItem = (itemId: number) => {
+    setDeletedItemIds([...deletedItemIds, itemId]);
+    const updatedItems = orderItems.filter((item) => item.id !== itemId);
+    setOrderItems(updatedItems);
+    recalculateTotal(updatedItems);
+  };
+
+  const handleUpdateItemQuantity = (itemId: number, cantidad: number) => {
+    const updatedItems = orderItems.map((item) => {
+      if (item.id === itemId) {
+        const subtotal = cantidad * item.precioUnitario;
+        return { ...item, cantidad, subtotal };
+      }
+      return item;
+    });
+    setOrderItems(updatedItems);
+    recalculateTotal(updatedItems);
+  };
+
+  const handleUpdateItemPrice = (itemId: number, precioUnitario: number) => {
+    const updatedItems = orderItems.map((item) => {
+      if (item.id === itemId) {
+        const subtotal = item.cantidad * precioUnitario;
+        return { ...item, precioUnitario, subtotal };
+      }
+      return item;
+    });
+    setOrderItems(updatedItems);
+    recalculateTotal(updatedItems);
+  };
+
+  const recalculateTotal = (items: PedidoDetalle[]) => {
+    const total = items.reduce((sum, item) => sum + item.subtotal, 0);
+    setValue('montoTotal', total);
+  };
+
+  const getProductName = (productoId: number) => {
+    const product = products.find((p) => p.id === productoId);
+    return product?.nombre || `Producto #${productoId}`;
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+    }).format(price);
   };
 
   const handleCancel = () => {
@@ -349,6 +471,188 @@ export default function EditOrderPage() {
               </CardContent>
             </Card>
 
+            {/* Order Items */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-5 w-5" />
+                    Productos del Pedido
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAddItem(!showAddItem)}
+                    disabled={isSubmitting}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Agregar Producto
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Add New Item Form */}
+                {showAddItem && (
+                  <div className="p-4 border rounded-lg bg-muted/50 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Nuevo Producto</h4>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowAddItem(false)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="col-span-3">
+                        <Label>Producto</Label>
+                        <Select
+                          value={newItem.productoId.toString()}
+                          onValueChange={(value) => {
+                            const productId = parseInt(value);
+                            const product = products.find((p) => p.id === productId);
+                            setNewItem({
+                              ...newItem,
+                              productoId: productId,
+                              precioUnitario: product?.precio || 0,
+                            });
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar producto" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {products.map((product) => (
+                              <SelectItem key={product.id} value={product.id.toString()}>
+                                {product.nombre} - {formatPrice(product.precio)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Cantidad</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={newItem.cantidad}
+                          onChange={(e) =>
+                            setNewItem({ ...newItem, cantidad: parseInt(e.target.value) || 1 })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>Precio Unitario</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={newItem.precioUnitario}
+                          onChange={(e) =>
+                            setNewItem({
+                              ...newItem,
+                              precioUnitario: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        <Button
+                          type="button"
+                          onClick={handleAddItem}
+                          className="w-full"
+                          size="sm"
+                        >
+                          Agregar
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Order Items List */}
+                {orderItems.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No hay productos en este pedido
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {orderItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 p-3 border rounded-lg bg-card"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">
+                            {getProductName(item.productoId)}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Producto ID: {item.productoId}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="text-right">
+                            <Label className="text-xs">Cantidad</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={item.cantidad}
+                              onChange={(e) =>
+                                handleUpdateItemQuantity(
+                                  item.id,
+                                  parseInt(e.target.value) || 1
+                                )
+                              }
+                              className="w-20 h-8 text-center"
+                              disabled={isSubmitting}
+                            />
+                          </div>
+                          <div className="text-right">
+                            <Label className="text-xs">Precio</Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              value={item.precioUnitario}
+                              onChange={(e) =>
+                                handleUpdateItemPrice(
+                                  item.id,
+                                  parseFloat(e.target.value) || 0
+                                )
+                              }
+                              className="w-28 h-8 text-right"
+                              disabled={isSubmitting}
+                            />
+                          </div>
+                          <div className="text-right min-w-[100px]">
+                            <Label className="text-xs">Subtotal</Label>
+                            <p className="font-bold text-sm">{formatPrice(item.subtotal)}</p>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveItem(item.id)}
+                            disabled={isSubmitting}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="flex justify-between items-center pt-3 border-t">
+                      <span className="font-medium">Total de Productos:</span>
+                      <span className="text-xl font-bold text-green-600">
+                        {formatPrice(orderItems.reduce((sum, item) => sum + item.subtotal, 0))}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Shipping and Coupons */}
             <Card>
               <CardHeader>
@@ -440,6 +744,10 @@ export default function EditOrderPage() {
                   <span className="font-medium">#{orderId}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-muted-foreground">Productos:</span>
+                  <Badge variant="secondary">{orderItems.length}</Badge>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Estado del pedido:</span>
                   <span className="font-medium capitalize">
                     {watch('estadoPedido')}
@@ -458,12 +766,8 @@ export default function EditOrderPage() {
                 {(watch('montoTotal') || 0) > 0 && (
                   <div className="flex justify-between pt-3 border-t">
                     <span className="font-medium">Monto total:</span>
-                    <span className="font-bold text-lg">
-                      {new Intl.NumberFormat('es-CO', {
-                        style: 'currency',
-                        currency: 'COP',
-                        minimumFractionDigits: 0,
-                      }).format(watch('montoTotal') || 0)}
+                    <span className="font-bold text-lg text-green-600">
+                      {formatPrice(watch('montoTotal') || 0)}
                     </span>
                   </div>
                 )}

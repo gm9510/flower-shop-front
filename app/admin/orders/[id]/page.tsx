@@ -2,12 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Package, User, CreditCard, Truck, Tag, Calendar, Loader2, Edit } from 'lucide-react';
+import { ArrowLeft, Package, User, CreditCard, Truck, Tag, Calendar, Loader2, Edit, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { orderService } from '@/services/api/orders';
-import type { PedidosResponse } from '@/types/shop';
+import { orderItemService, type PedidoDetalle } from '@/services/api/order-items';
+import { productService } from '@/services/api/products';
+import type { PedidosResponse, Producto } from '@/types/shop';
 
 export default function OrderDetailsPage() {
   const params = useParams();
@@ -15,6 +25,8 @@ export default function OrderDetailsPage() {
   const orderId = Number(params.id);
 
   const [order, setOrder] = useState<PedidosResponse | null>(null);
+  const [orderItems, setOrderItems] = useState<PedidoDetalle[]>([]);
+  const [products, setProducts] = useState<Map<number, Producto>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,8 +40,31 @@ export default function OrderDetailsPage() {
     try {
       setLoading(true);
       setError(null);
-      const orderData = await orderService.getPedido(orderId);
+      
+      // Fetch order and order items in parallel
+      const [orderData, itemsData] = await Promise.all([
+        orderService.getPedido(orderId),
+        orderItemService.getItemsByPedido(orderId),
+      ]);
+      
       setOrder(orderData);
+      setOrderItems(itemsData);
+
+      // Fetch product details for all items
+      if (itemsData.length > 0) {
+        const productIds = [...new Set(itemsData.map(item => item.productoId))];
+        const productsData = await Promise.all(
+          productIds.map(id => productService.getProducto(id).catch(() => null))
+        );
+        
+        const productsMap = new Map<number, Producto>();
+        productsData.forEach(product => {
+          if (product) {
+            productsMap.set(product.id, product);
+          }
+        });
+        setProducts(productsMap);
+      }
     } catch (err: any) {
       console.error('Failed to fetch order details:', err);
       setError('No se pudo cargar los detalles del pedido');
@@ -77,6 +112,11 @@ export default function OrderDetailsPage() {
         {config.label}
       </Badge>
     );
+  };
+
+  const getProductName = (productoId: number) => {
+    const product = products.get(productoId);
+    return product?.nombre || `Producto #${productoId}`;
   };
 
   if (loading) {
@@ -190,6 +230,68 @@ export default function OrderDetailsPage() {
             </CardContent>
           </Card>
 
+          {/* Order Items */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingCart className="h-5 w-5" />
+                Productos del Pedido
+                <Badge variant="secondary" className="ml-2">
+                  {orderItems.length} {orderItems.length === 1 ? 'producto' : 'productos'}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {orderItems.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No hay productos en este pedido
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Producto</TableHead>
+                        <TableHead className="text-right">Cantidad</TableHead>
+                        <TableHead className="text-right">Precio Unit.</TableHead>
+                        <TableHead className="text-right">Subtotal</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {orderItems.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{getProductName(item.productoId)}</p>
+                              <p className="text-sm text-muted-foreground">
+                                ID: {item.productoId}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant="outline">{item.cantidad}</Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {formatPrice(item.precioUnitario)}
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            {formatPrice(item.subtotal)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  <div className="flex justify-between items-center pt-4 border-t">
+                    <span className="text-lg font-medium">Total de Productos:</span>
+                    <span className="text-2xl font-bold text-green-600">
+                      {formatPrice(orderItems.reduce((sum, item) => sum + item.subtotal, 0))}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Client Information */}
           <Card>
             <CardHeader>
@@ -285,6 +387,10 @@ export default function OrderDetailsPage() {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Cliente ID</span>
                 <span className="font-medium">#{order.clienteId}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Productos</span>
+                <Badge variant="secondary">{orderItems.length}</Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Estado</span>
