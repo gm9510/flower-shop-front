@@ -3,16 +3,15 @@ import { apiClient } from '@/lib/api';
 // Order Item (PedidoDetalle) Types
 export interface PedidoDetalle {
   id: number;
-  pedidoId: number;
-  productoId: number;
+  idPedido: number;
+  idProducto: number;
   cantidad: number;
   precioUnitario: number;
-  subtotal: number;
 }
 
 export interface PedidoDetalleCreate {
-  pedidoId: number;
-  productoId: number;
+  idPedido: number;
+  idProducto: number;
   cantidad: number;
   precioUnitario: number;
   subtotal: number;
@@ -20,8 +19,6 @@ export interface PedidoDetalleCreate {
 
 export interface PedidoDetalleUpdate {
   cantidad?: number;
-  precioUnitario?: number;
-  subtotal?: number;
 }
 
 export const orderItemService = {
@@ -29,8 +26,8 @@ export const orderItemService = {
   async getPedidoDetalles(params?: {
     skip?: number;
     limit?: number;
-    pedido_id?: number;
-    producto_id?: number;
+    idPedido?: number;
+    idProducto?: number;
   }): Promise<PedidoDetalle[]> {
     return apiClient.get<PedidoDetalle[]>('/api/pedidodetalles/', params);
   },
@@ -50,13 +47,18 @@ export const orderItemService = {
     return apiClient.put<PedidoDetalle>(`/api/pedidodetalles/${id}`, updates);
   },
 
+  // Update order item quantity (PATCH)
+  async updatePedidoDetalleCantidad(id: number, cantidad: number): Promise<PedidoDetalle> {
+    return apiClient.patch<PedidoDetalle>(`/api/pedidodetalles/${id}/cantidad?cantidad=${cantidad}`);
+  },
+
   // Delete order item
   async deletePedidoDetalle(id: number): Promise<void> {
     return apiClient.delete<void>(`/api/pedidodetalles/${id}`);
   },
 
   // Get all items for a specific order
-  async getItemsByPedido(pedidoId: number): Promise<PedidoDetalle[]> {
-    return this.getPedidoDetalles({ pedido_id: pedidoId });
+  async getItemsByPedido(idPedido: number): Promise<PedidoDetalle[]> {
+    return this.getPedidoDetalles({ idPedido });
   },
 };

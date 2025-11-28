@@ -23,21 +23,29 @@ import { clientService } from '@/services/api/clients';
 import { couponService } from '@/services/api/coupons';
 import { shippingService } from '@/services/api/shipping';
 import type { PedidosCreate, Cliente, Cupon, MetodoEnvio } from '@/types/shop';
+import { EstadoPedido, EstadoPago } from '@/types/shop';
 import Header from '@/components/layout/header';
 
 // Form validation schema
 const orderSchema = z.object({
-    clienteId: z.number().min(1, 'Debe seleccionar un cliente'),
+    numeroFactura: z.number().optional(),
+    idEntidad: z.number().min(1, 'Debe seleccionar una entidad'),
+    subTotal: z.number().min(0, 'El subtotal debe ser mayor o igual a 0'),
+    descuento: z.number().min(0, 'El descuento debe ser mayor o igual a 0').optional(),
     montoTotal: z.number().min(0.01, 'El monto debe ser mayor a 0'),
+    saldo: z.number().optional(),
     estadoPedido: z
         .enum(['pendiente', 'procesando', 'enviado', 'entregado', 'cancelado'])
         .optional(),
     estadoPago: z.enum(['pendiente', 'pagado', 'fallido', 'reembolsado']).optional(),
     metodoPago: z.string().optional(),
     direccionEnvio: z.string().optional(),
-    cuponId: z.number().optional(),
-    metodoEnvioId: z.number().optional(),
-    fechaEnvio: z.string().optional(),
+    fechaEntrega: z.string().optional(),
+    idCupon: z.number().optional(),
+    idEnvio: z.number().optional(),
+    efectivo: z.number().min(0).optional(),
+    transferencia: z.number().min(0).optional(),
+    usuario: z.string().optional(),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -62,14 +70,20 @@ export default function CreateOrderPage() {
         defaultValues: {
             estadoPedido: 'pendiente',
             estadoPago: 'pendiente',
-            metodoPago: '',
+            metodoPago: 'DE CONTADO',
             direccionEnvio: '',
+            subTotal: 0,
+            descuento: 0,
+            montoTotal: 0,
+            saldo: 0,
+            efectivo: 0,
+            transferencia: 0,
         },
     });
 
-    const selectedClientId = watch('clienteId');
-    const selectedCouponId = watch('cuponId');
-    const selectedShippingId = watch('metodoEnvioId');
+    const selectedEntidadId = watch('idEntidad');
+    const selectedCouponId = watch('idCupon');
+    const selectedShippingId = watch('idEnvio');
 
     useEffect(() => {
         fetchData();
@@ -101,15 +115,22 @@ export default function CreateOrderPage() {
             setError(null);
 
             const orderData: PedidosCreate = {
-                clienteId: data.clienteId,
+                numeroFactura: data.numeroFactura,
+                idEntidad: data.idEntidad,
+                subTotal: data.subTotal,
+                descuento: data.descuento,
                 montoTotal: data.montoTotal,
-                estadoPedido: data.estadoPedido || 'pendiente',
-                estadoPago: data.estadoPago || 'pendiente',
-                metodoPago: data.metodoPago || undefined,
+                saldo: data.saldo,
+                estadoPedido: data.estadoPedido as EstadoPedido || EstadoPedido.PENDIENTE,
+                estadoPago: data.estadoPago as EstadoPago || EstadoPago.PENDIENTE,
+                metodoPago: data.metodoPago || 'DE CONTADO',
                 direccionEnvio: data.direccionEnvio || undefined,
-                cuponId: data.cuponId || undefined,
-                metodoEnvioId: data.metodoEnvioId || undefined,
-                fechaEnvio: data.fechaEnvio || undefined,
+                fechaEntrega: data.fechaEntrega ? `${data.fechaEntrega}T00:00:00` : new Date().toISOString(),
+                idCupon: data.idCupon || undefined,
+                idEnvio: data.idEnvio || undefined,
+                efectivo: data.efectivo,
+                transferencia: data.transferencia,
+                usuario: data.usuario,
             };
 
             const newOrder = await orderService.createPedido(orderData);
@@ -178,19 +199,19 @@ export default function CreateOrderPage() {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <User className="h-5 w-5" />
-                                        Información del Cliente
+                                        Información de la Entidad
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div>
-                                        <Label htmlFor="clienteId">Cliente *</Label>
+                                        <Label htmlFor="idEntidad">Entidad *</Label>
                                         <Select
-                                            value={selectedClientId?.toString()}
-                                            onValueChange={(value) => setValue('clienteId', Number(value))}
+                                            value={selectedEntidadId?.toString()}
+                                            onValueChange={(value) => setValue('idEntidad', Number(value))}
                                             disabled={isSubmitting}
                                         >
-                                            <SelectTrigger id="clienteId">
-                                                <SelectValue placeholder="Seleccione un cliente" />
+                                            <SelectTrigger id="idEntidad">
+                                                <SelectValue placeholder="Seleccione una entidad" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {clients.map((client) => (
@@ -200,8 +221,8 @@ export default function CreateOrderPage() {
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        {errors.clienteId && (
-                                            <p className="text-sm text-red-500 mt-1">{errors.clienteId.message}</p>
+                                        {errors.idEntidad && (
+                                            <p className="text-sm text-red-500 mt-1">{errors.idEntidad.message}</p>
                                         )}
                                     </div>
 
@@ -229,39 +250,130 @@ export default function CreateOrderPage() {
                                 <CardContent className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="montoTotal">Monto Total *</Label>
+                                            <Label htmlFor="numeroFactura">Número de Factura</Label>
                                             <Input
-                                                id="montoTotal"
+                                                id="numeroFactura"
+                                                type="number"
+                                                {...register('numeroFactura', { valueAsNumber: true })}
+                                                placeholder="Número de factura"
+                                                disabled={isSubmitting}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="usuario">Usuario</Label>
+                                            <Input
+                                                id="usuario"
+                                                type="text"
+                                                {...register('usuario')}
+                                                placeholder="Usuario que registra"
+                                                disabled={isSubmitting}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <div>
+                                            <Label htmlFor="subTotal">Subtotal (COP) *</Label>
+                                            <Input
+                                                id="subTotal"
                                                 type="number"
                                                 step="0.01"
                                                 min="0"
-                                                {...register('montoTotal', { valueAsNumber: true })}
+                                                {...register('subTotal', { valueAsNumber: true })}
                                                 placeholder="0.00"
                                                 disabled={isSubmitting}
                                             />
-                                            {errors.montoTotal && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.montoTotal.message}</p>
+                                            {errors.subTotal && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.subTotal.message}</p>
                                             )}
                                         </div>
-
                                         <div>
-                                            <Label htmlFor="metodoPago">Método de Pago</Label>
-                                            <Select
-                                                value={watch('metodoPago')}
-                                                onValueChange={(value) => setValue('metodoPago', value)}
+                                            <Label htmlFor="descuento">Descuento (COP)</Label>
+                                            <Input
+                                                id="descuento"
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                {...register('descuento', { valueAsNumber: true })}
+                                                placeholder="0.00"
                                                 disabled={isSubmitting}
-                                            >
-                                                <SelectTrigger id="metodoPago">
-                                                    <SelectValue placeholder="Seleccione método" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="efectivo">Efectivo</SelectItem>
-                                                    <SelectItem value="tarjeta">Tarjeta</SelectItem>
-                                                    <SelectItem value="transferencia">Transferencia</SelectItem>
-                                                    <SelectItem value="pse">PSE</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                            />
                                         </div>
+                                        <div>
+                                            <Label htmlFor="saldo">Saldo (COP)</Label>
+                                            <Input
+                                                id="saldo"
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                {...register('saldo', { valueAsNumber: true })}
+                                                placeholder="0.00"
+                                                disabled={isSubmitting}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="montoTotal">Monto Total (COP) *</Label>
+                                        <Input
+                                            id="montoTotal"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            {...register('montoTotal', { valueAsNumber: true })}
+                                            placeholder="0.00"
+                                            disabled={isSubmitting}
+                                        />
+                                        {errors.montoTotal && (
+                                            <p className="text-sm text-red-500 mt-1">{errors.montoTotal.message}</p>
+                                        )}
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <Label htmlFor="efectivo">Efectivo (COP)</Label>
+                                            <Input
+                                                id="efectivo"
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                {...register('efectivo', { valueAsNumber: true })}
+                                                placeholder="0.00"
+                                                disabled={isSubmitting}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor="transferencia">Transferencia (COP)</Label>
+                                            <Input
+                                                id="transferencia"
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                {...register('transferencia', { valueAsNumber: true })}
+                                                placeholder="0.00"
+                                                disabled={isSubmitting}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="metodoPago">Método de Pago</Label>
+                                        <Select
+                                            value={watch('metodoPago')}
+                                            onValueChange={(value) => setValue('metodoPago', value)}
+                                            disabled={isSubmitting}
+                                        >
+                                            <SelectTrigger id="metodoPago">
+                                                <SelectValue placeholder="Seleccione método" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="DE CONTADO">De Contado</SelectItem>
+                                                <SelectItem value="efectivo">Efectivo</SelectItem>
+                                                <SelectItem value="tarjeta">Tarjeta</SelectItem>
+                                                <SelectItem value="transferencia">Transferencia</SelectItem>
+                                                <SelectItem value="pse">PSE</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
@@ -318,13 +430,13 @@ export default function CreateOrderPage() {
                                 <CardContent className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="metodoEnvioId">Método de Envío</Label>
+                                            <Label htmlFor="idEnvio">Método de Envío</Label>
                                             <Select
                                                 value={selectedShippingId?.toString()}
-                                                onValueChange={(value) => setValue('metodoEnvioId', Number(value))}
+                                                onValueChange={(value) => setValue('idEnvio', Number(value))}
                                                 disabled={isSubmitting}
                                             >
-                                                <SelectTrigger id="metodoEnvioId">
+                                                <SelectTrigger id="idEnvio">
                                                     <SelectValue placeholder="Seleccione método" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -338,11 +450,11 @@ export default function CreateOrderPage() {
                                         </div>
 
                                         <div>
-                                            <Label htmlFor="fechaEnvio">Fecha de Envío</Label>
+                                            <Label htmlFor="fechaEntrega">Fecha de Entrega</Label>
                                             <Input
-                                                id="fechaEnvio"
+                                                id="fechaEntrega"
                                                 type="date"
-                                                {...register('fechaEnvio')}
+                                                {...register('fechaEntrega')}
                                                 disabled={isSubmitting}
                                             />
                                         </div>
@@ -360,13 +472,13 @@ export default function CreateOrderPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div>
-                                        <Label htmlFor="cuponId">Cupón (Opcional)</Label>
+                                        <Label htmlFor="idCupon">Cupón (Opcional)</Label>
                                         <Select
                                             value={selectedCouponId?.toString()}
-                                            onValueChange={(value) => setValue('cuponId', Number(value))}
+                                            onValueChange={(value) => setValue('idCupon', Number(value))}
                                             disabled={isSubmitting}
                                         >
-                                            <SelectTrigger id="cuponId">
+                                            <SelectTrigger id="idCupon">
                                                 <SelectValue placeholder="Sin cupón" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -406,15 +518,51 @@ export default function CreateOrderPage() {
                                             <span className="font-medium capitalize">{watch('metodoPago')}</span>
                                         </div>
                                     )}
-                                    {watch('montoTotal') > 0 && (
+                                    {watch('subTotal') > 0 && (
                                         <div className="flex justify-between pt-3 border-t">
+                                            <span className="text-muted-foreground">Subtotal:</span>
+                                            <span className="font-medium">
+                                                {new Intl.NumberFormat('es-CO', {
+                                                    style: 'currency',
+                                                    currency: 'COP',
+                                                    minimumFractionDigits: 0,
+                                                }).format(watch('subTotal') || 0)}
+                                            </span>
+                                        </div>
+                                    )}
+                                    {(watch('descuento') || 0) > 0 && (
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">Descuento:</span>
+                                            <span className="font-medium text-red-600">
+                                                -{new Intl.NumberFormat('es-CO', {
+                                                    style: 'currency',
+                                                    currency: 'COP',
+                                                    minimumFractionDigits: 0,
+                                                }).format(watch('descuento') || 0)}
+                                            </span>
+                                        </div>
+                                    )}
+                                    {watch('montoTotal') > 0 && (
+                                        <div className="flex justify-between">
                                             <span className="font-medium">Monto total:</span>
-                                            <span className="font-bold text-lg">
+                                            <span className="font-bold text-lg text-green-600">
                                                 {new Intl.NumberFormat('es-CO', {
                                                     style: 'currency',
                                                     currency: 'COP',
                                                     minimumFractionDigits: 0,
                                                 }).format(watch('montoTotal') || 0)}
+                                            </span>
+                                        </div>
+                                    )}
+                                    {(watch('saldo') || 0) > 0 && (
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">Saldo:</span>
+                                            <span className="font-medium text-orange-600">
+                                                {new Intl.NumberFormat('es-CO', {
+                                                    style: 'currency',
+                                                    currency: 'COP',
+                                                    minimumFractionDigits: 0,
+                                                }).format(watch('saldo') || 0)}
                                             </span>
                                         </div>
                                     )}

@@ -45,51 +45,6 @@ export interface CategoriaCreate {
   descripcion?: string;
 }
 
-// Order Types (based on backend schemas)
-export interface PedidosResponse {
-  id: number;
-  clienteId: number;
-  montoTotal: number;
-  estadoPedido: string;
-  estadoPago: string;
-  metodoPago?: string;
-  direccionEnvio?: string;
-  cuponId?: number;
-  metodoEnvioId?: number;
-  fechaEnvio: string; // ISO date string
-  creadoEn: string; // ISO date string
-}
-
-export interface PedidosDetail extends PedidosResponse {
-  cliente_nombre?: string;
-  cliente_email?: string;
-  cupon_codigo?: string;
-  metodo_envio_nombre?: string;
-}
-
-export interface PedidosCreate {
-  clienteId: number;
-  montoTotal: number;
-  estadoPedido?: string;
-  estadoPago?: string;
-  metodoPago?: string;
-  direccionEnvio?: string;
-  cuponId?: number;
-  metodoEnvioId?: number;
-  fechaEnvio?: string; // ISO date string
-}
-
-export interface PedidosUpdate {
-  montoTotal?: number;
-  estadoPedido?: string;
-  estadoPago?: string;
-  metodoPago?: string;
-  direccionEnvio?: string;
-  cuponId?: number;
-  metodoEnvioId?: number;
-  fechaEnvio?: string; // ISO date string
-}
-
 // Order Status Enums
 export enum EstadoPedido {
   PENDIENTE = 'pendiente',
@@ -104,6 +59,74 @@ export enum EstadoPago {
   PAGADO = 'pagado',
   FALLIDO = 'fallido',
   REEMBOLSADO = 'reembolsado'
+}
+
+// Order Types (based on backend schemas)
+export interface PedidosResponse {
+  id: number;
+  numeroFactura?: number;
+  idEntidad: number;
+  subTotal: number;
+  descuento?: number;
+  montoTotal: number;
+  saldo?: number;
+  estadoPedido: EstadoPedido;
+  estadoPago: EstadoPago;
+  metodoPago?: string;
+  direccionEnvio?: string;
+  fechaEntrega: string; // ISO date string
+  idCupon?: number;
+  idEnvio?: number;
+  efectivo?: number;
+  transferencia?: number;
+  usuario?: string;
+  registro?: string; // ISO date string
+}
+
+export interface PedidosCreate {
+  numeroFactura?: number;
+  idEntidad: number;
+  subTotal: number;
+  descuento?: number;
+  montoTotal: number;
+  saldo?: number;
+  estadoPedido?: EstadoPedido;
+  estadoPago?: EstadoPago;
+  metodoPago?: string;
+  direccionEnvio?: string;
+  fechaEntrega: string; // ISO date string
+  idCupon?: number;
+  idEnvio?: number;
+  efectivo?: number;
+  transferencia?: number;
+  usuario?: string;
+  registro?: string;
+}
+
+export interface PedidosUpdate {
+  numeroFactura?: number;
+  idEntidad?: number;
+  subTotal?: number;
+  descuento?: number;
+  montoTotal?: number;
+  saldo?: number;
+  estadoPedido?: EstadoPedido;
+  estadoPago?: EstadoPago;
+  metodoPago?: string;
+  direccionEnvio?: string;
+  fechaEntrega?: string; // ISO date string
+  idCupon?: number;
+  idEnvio?: number;
+  efectivo?: number;
+  transferencia?: number;
+  usuario?: string;
+}
+
+export interface PedidosDetail extends PedidosResponse {
+  entidad_nombre?: string;
+  entidad_email?: string;
+  cupon_codigo?: string;
+  envio_nombre?: string;
 }
 
 // Client Types (based on backend ClienteResponse)

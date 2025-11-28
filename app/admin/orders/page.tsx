@@ -65,7 +65,7 @@ export default function OrdersPage() {
         const query = searchQuery.toLowerCase();
         filteredOrders = response.filter(order =>
           order.id.toString().includes(query) ||
-          order.clienteId.toString().includes(query) ||
+          order.idEntidad.toString().includes(query) ||
           order.metodoPago?.toLowerCase().includes(query)
         );
       }
@@ -104,10 +104,6 @@ export default function OrdersPage() {
   const handleExportClick = () => {
     console.log('Export clicked');
     // TODO: Implement export functionality
-  };
-
-  const handleNewOrderClick = () => {
-    router.push('/admin/orders/create');
   };
 
   const handleViewOrder = (orderId: number) => {

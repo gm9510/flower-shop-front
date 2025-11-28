@@ -34,19 +34,28 @@ import type {
     MetodoEnvio,
     Producto,
 } from '@/types/shop';
+import { EstadoPedido, EstadoPago } from '@/types/shop';
 
 // Form validation schema
 const orderSchema = z.object({
-    montoTotal: z.number().min(0.01, 'El monto debe ser mayor a 0').optional(),
+    numeroFactura: z.number().optional(),
+    idEntidad: z.number(),
+    subTotal: z.number().min(0, 'El subtotal debe ser mayor o igual a 0'),
+    descuento: z.number().min(0, 'El descuento debe ser mayor o igual a 0').optional(),
+    montoTotal: z.number().min(0.01, 'El monto debe ser mayor a 0'),
+    saldo: z.number().optional(),
     estadoPedido: z
         .enum(['pendiente', 'procesando', 'enviado', 'entregado', 'cancelado'])
         .optional(),
     estadoPago: z.enum(['pendiente', 'pagado', 'fallido', 'reembolsado']).optional(),
     metodoPago: z.string().optional(),
     direccionEnvio: z.string().optional(),
-    cuponId: z.number().optional().nullable(),
-    metodoEnvioId: z.number().optional().nullable(),
-    fechaEnvio: z.string().optional(),
+    fechaEntrega: z.string().optional(),
+    idCupon: z.number().optional().nullable(),
+    idEnvio: z.number().optional().nullable(),
+    efectivo: z.number().min(0).optional(),
+    transferencia: z.number().min(0).optional(),
+    usuario: z.string().optional(),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -102,17 +111,22 @@ export default function EditOrderPage() {
             setOrder(orderData);
 
             // Set form values with existing order data
+            setValue('numeroFactura', orderData.numeroFactura);
+            setValue('idEntidad', orderData.idEntidad);
+            setValue('subTotal', orderData.subTotal);
+            setValue('descuento', orderData.descuento);
             setValue('montoTotal', orderData.montoTotal);
+            setValue('saldo', orderData.saldo);
             setValue('estadoPedido', orderData.estadoPedido as any);
             setValue('estadoPago', orderData.estadoPago as any);
             setValue('metodoPago', orderData.metodoPago || '');
             setValue('direccionEnvio', orderData.direccionEnvio || '');
-            setValue('cuponId', orderData.cuponId || null);
-            setValue('metodoEnvioId', orderData.metodoEnvioId || null);
-            setValue(
-                'fechaEnvio',
-                orderData.fechaEnvio ? orderData.fechaEnvio.split('T')[0] : ''
-            );
+            setValue('fechaEntrega', orderData.fechaEntrega ? orderData.fechaEntrega.split('T')[0] : '');
+            setValue('idCupon', orderData.idCupon || null);
+            setValue('idEnvio', orderData.idEnvio || null);
+            setValue('efectivo', orderData.efectivo);
+            setValue('transferencia', orderData.transferencia);
+            setValue('usuario', orderData.usuario || '');
 
             // Load dropdown data and order items
             const [clientsData, couponsData, shippingData, itemsData, productsData] = await Promise.all([
@@ -142,16 +156,22 @@ export default function EditOrderPage() {
         try {
             // Remove undefined values
             const updateData: PedidosUpdate = {};
+            if (data.numeroFactura !== undefined) updateData.numeroFactura = data.numeroFactura;
+            if (data.idEntidad !== undefined) updateData.idEntidad = data.idEntidad;
+            if (data.subTotal !== undefined) updateData.subTotal = data.subTotal;
+            if (data.descuento !== undefined) updateData.descuento = data.descuento;
             if (data.montoTotal !== undefined) updateData.montoTotal = data.montoTotal;
-            if (data.estadoPedido !== undefined) updateData.estadoPedido = data.estadoPedido;
-            if (data.estadoPago !== undefined) updateData.estadoPago = data.estadoPago;
+            if (data.saldo !== undefined) updateData.saldo = data.saldo;
+            if (data.estadoPedido !== undefined) updateData.estadoPedido = data.estadoPedido as EstadoPedido;
+            if (data.estadoPago !== undefined) updateData.estadoPago = data.estadoPago as EstadoPago;
             if (data.metodoPago !== undefined) updateData.metodoPago = data.metodoPago;
             if (data.direccionEnvio !== undefined) updateData.direccionEnvio = data.direccionEnvio;
-            if (data.cuponId !== undefined && data.cuponId !== null)
-                updateData.cuponId = data.cuponId;
-            if (data.metodoEnvioId !== undefined && data.metodoEnvioId !== null)
-                updateData.metodoEnvioId = data.metodoEnvioId;
-            if (data.fechaEnvio !== undefined) updateData.fechaEnvio = data.fechaEnvio;
+            if (data.fechaEntrega !== undefined) updateData.fechaEntrega = `${data.fechaEntrega}T00:00:00`;
+            if (data.idCupon !== undefined && data.idCupon !== null) updateData.idCupon = data.idCupon;
+            if (data.idEnvio !== undefined && data.idEnvio !== null) updateData.idEnvio = data.idEnvio;
+            if (data.efectivo !== undefined) updateData.efectivo = data.efectivo;
+            if (data.transferencia !== undefined) updateData.transferencia = data.transferencia;
+            if (data.usuario !== undefined) updateData.usuario = data.usuario;
 
             // Update order
             await orderService.updatePedido(orderId, updateData);
@@ -165,11 +185,7 @@ export default function EditOrderPage() {
             const updatePromises = orderItems
                 .filter((item) => item.id && !deletedItemIds.includes(item.id))
                 .map((item) =>
-                    orderItemService.updatePedidoDetalle(item.id, {
-                        cantidad: item.cantidad,
-                        precioUnitario: item.precioUnitario,
-                        subtotal: item.subtotal,
-                    })
+                    orderItemService.updatePedidoDetalleCantidad(item.id, item.cantidad)
                 );
 
             await Promise.all(updatePromises);
@@ -195,8 +211,8 @@ export default function EditOrderPage() {
 
             // Create the new item in the database
             const createdItem = await orderItemService.createPedidoDetalle({
-                pedidoId: orderId,
-                productoId: newItem.productoId,
+                idPedido: orderId,
+                idProducto: newItem.productoId,
                 cantidad: newItem.cantidad,
                 precioUnitario: newItem.precioUnitario || product.precioVenta,
                 subtotal: newItem.cantidad * (newItem.precioUnitario || product.precioVenta),
@@ -210,7 +226,6 @@ export default function EditOrderPage() {
             setShowAddItem(false);
 
             // Recalculate total
-            recalculateTotal([...orderItems, createdItem]);
         } catch (error) {
             console.error('Error adding item:', error);
             setError('Error al agregar el producto');
@@ -221,7 +236,6 @@ export default function EditOrderPage() {
         setDeletedItemIds([...deletedItemIds, itemId]);
         const updatedItems = orderItems.filter((item) => item.id !== itemId);
         setOrderItems(updatedItems);
-        recalculateTotal(updatedItems);
     };
 
     const handleUpdateItemQuantity = (itemId: number, cantidad: number) => {
@@ -233,7 +247,6 @@ export default function EditOrderPage() {
             return item;
         });
         setOrderItems(updatedItems);
-        recalculateTotal(updatedItems);
     };
 
     const handleUpdateItemPrice = (itemId: number, precioUnitario: number) => {
@@ -245,12 +258,6 @@ export default function EditOrderPage() {
             return item;
         });
         setOrderItems(updatedItems);
-        recalculateTotal(updatedItems);
-    };
-
-    const recalculateTotal = (items: PedidoDetalle[]) => {
-        const total = items.reduce((sum, item) => sum + item.subtotal, 0);
-        setValue('montoTotal', total);
     };
 
     const getProductName = (productoId: number) => {
@@ -364,12 +371,12 @@ export default function EditOrderPage() {
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div>
-                                            <Label>Cliente</Label>
+                                            <Label>Entidad</Label>
                                             <div className="mt-1 p-3 bg-muted rounded-lg border">
-                                                <p className="font-medium">Cliente ID: {order.clienteId}</p>
+                                                <p className="font-medium">Entidad ID: {order.idEntidad}</p>
                                             </div>
                                             <p className="text-xs text-muted-foreground mt-2">
-                                                El cliente no puede ser modificado después de crear el pedido
+                                                La entidad no puede ser modificada después de crear el pedido
                                             </p>
                                         </div>
 
@@ -395,6 +402,73 @@ export default function EditOrderPage() {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <Label htmlFor="numeroFactura">Número de Factura</Label>
+                                                <Input
+                                                    id="numeroFactura"
+                                                    type="number"
+                                                    placeholder="Número de factura"
+                                                    {...register('numeroFactura', { valueAsNumber: true })}
+                                                    disabled={isSubmitting}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="usuario">Usuario</Label>
+                                                <Input
+                                                    id="usuario"
+                                                    type="text"
+                                                    placeholder="Usuario que registra"
+                                                    {...register('usuario')}
+                                                    disabled={isSubmitting}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-3 gap-4">
+                                            <div>
+                                                <Label htmlFor="subTotal">Subtotal (COP) *</Label>
+                                                <Input
+                                                    id="subTotal"
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    placeholder="0.00"
+                                                    {...register('subTotal', { valueAsNumber: true })}
+                                                    disabled={isSubmitting}
+                                                />
+                                                {errors.subTotal && (
+                                                    <p className="text-sm text-red-600 mt-1">
+                                                        {errors.subTotal.message}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="descuento">Descuento (COP)</Label>
+                                                <Input
+                                                    id="descuento"
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    placeholder="0.00"
+                                                    {...register('descuento', { valueAsNumber: true })}
+                                                    disabled={isSubmitting}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="saldo">Saldo (COP)</Label>
+                                                <Input
+                                                    id="saldo"
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    placeholder="0.00"
+                                                    {...register('saldo', { valueAsNumber: true })}
+                                                    disabled={isSubmitting}
+                                                />
+                                            </div>
+                                        </div>
+
                                         <div>
                                             <Label htmlFor="montoTotal">Monto Total (COP) *</Label>
                                             <Input
@@ -411,6 +485,33 @@ export default function EditOrderPage() {
                                                     {errors.montoTotal.message}
                                                 </p>
                                             )}
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <Label htmlFor="efectivo">Efectivo (COP)</Label>
+                                                <Input
+                                                    id="efectivo"
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    placeholder="0.00"
+                                                    {...register('efectivo', { valueAsNumber: true })}
+                                                    disabled={isSubmitting}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label htmlFor="transferencia">Transferencia (COP)</Label>
+                                                <Input
+                                                    id="transferencia"
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    placeholder="0.00"
+                                                    {...register('transferencia', { valueAsNumber: true })}
+                                                    disabled={isSubmitting}
+                                                />
+                                            </div>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4">
@@ -592,10 +693,10 @@ export default function EditOrderPage() {
                                                     >
                                                         <div className="flex-1 min-w-0">
                                                             <p className="font-medium truncate">
-                                                                {getProductName(item.productoId)}
+                                                                {getProductName(item.idProducto)}
                                                             </p>
                                                             <p className="text-sm text-muted-foreground">
-                                                                Producto ID: {item.productoId}
+                                                                Producto ID: {item.idProducto}
                                                             </p>
                                                         </div>
                                                         <div className="flex items-center gap-2">
@@ -631,10 +732,6 @@ export default function EditOrderPage() {
                                                                     disabled={isSubmitting}
                                                                 />
                                                             </div>
-                                                            <div className="text-right min-w-[100px]">
-                                                                <Label className="text-xs">Subtotal</Label>
-                                                                <p className="font-bold text-sm">{formatPrice(item.subtotal)}</p>
-                                                            </div>
                                                             <Button
                                                                 type="button"
                                                                 variant="ghost"
@@ -648,12 +745,6 @@ export default function EditOrderPage() {
                                                         </div>
                                                     </div>
                                                 ))}
-                                                <div className="flex justify-between items-center pt-3 border-t">
-                                                    <span className="font-medium">Total de Productos:</span>
-                                                    <span className="text-xl font-bold text-green-600">
-                                                        {formatPrice(orderItems.reduce((sum, item) => sum + item.subtotal, 0))}
-                                                    </span>
-                                                </div>
                                             </div>
                                         )}
                                     </CardContent>
@@ -670,15 +761,15 @@ export default function EditOrderPage() {
                                     <CardContent className="space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <Label htmlFor="metodoEnvioId">Método de Envío</Label>
+                                                <Label htmlFor="idEnvio">Método de Envío</Label>
                                                 <Select
-                                                    value={watch('metodoEnvioId')?.toString()}
+                                                    value={watch('idEnvio')?.toString()}
                                                     onValueChange={(value: string) =>
-                                                        setValue('metodoEnvioId', parseInt(value))
+                                                        setValue('idEnvio', parseInt(value))
                                                     }
                                                     disabled={isSubmitting}
                                                 >
-                                                    <SelectTrigger id="metodoEnvioId">
+                                                    <SelectTrigger id="idEnvio">
                                                         <SelectValue placeholder="Seleccionar método" />
                                                     </SelectTrigger>
                                                     <SelectContent>
@@ -693,29 +784,29 @@ export default function EditOrderPage() {
                                             </div>
 
                                             <div>
-                                                <Label htmlFor="fechaEnvio">Fecha de Envío</Label>
+                                                <Label htmlFor="fechaEntrega">Fecha de Entrega</Label>
                                                 <Input
-                                                    id="fechaEnvio"
+                                                    id="fechaEntrega"
                                                     type="date"
-                                                    {...register('fechaEnvio')}
+                                                    {...register('fechaEntrega')}
                                                     disabled={isSubmitting}
                                                 />
                                             </div>
                                         </div>
 
                                         <div>
-                                            <Label htmlFor="cuponId">
+                                            <Label htmlFor="idCupon">
                                                 <Tag className="h-4 w-4 inline mr-1" />
                                                 Cupón de Descuento
                                             </Label>
                                             <Select
-                                                value={watch('cuponId')?.toString()}
+                                                value={watch('idCupon')?.toString()}
                                                 onValueChange={(value: string) =>
-                                                    setValue('cuponId', parseInt(value))
+                                                    setValue('idCupon', parseInt(value))
                                                 }
                                                 disabled={isSubmitting}
                                             >
-                                                <SelectTrigger id="cuponId">
+                                                <SelectTrigger id="idCupon">
                                                     <SelectValue placeholder="Sin cupón" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -749,6 +840,12 @@ export default function EditOrderPage() {
                                             <span className="text-muted-foreground">ID del pedido:</span>
                                             <span className="font-medium">#{orderId}</span>
                                         </div>
+                                        {watch('numeroFactura') && (
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">Núm. Factura:</span>
+                                                <span className="font-medium">{watch('numeroFactura')}</span>
+                                            </div>
+                                        )}
                                         <div className="flex justify-between">
                                             <span className="text-muted-foreground">Productos:</span>
                                             <Badge variant="secondary">{orderItems.length}</Badge>
@@ -769,11 +866,35 @@ export default function EditOrderPage() {
                                                 <span className="font-medium capitalize">{watch('metodoPago')}</span>
                                             </div>
                                         )}
-                                        {(watch('montoTotal') || 0) > 0 && (
+                                        {(watch('subTotal') || 0) > 0 && (
                                             <div className="flex justify-between pt-3 border-t">
+                                                <span className="text-muted-foreground">Subtotal:</span>
+                                                <span className="font-medium">
+                                                    {formatPrice(watch('subTotal') || 0)}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {(watch('descuento') || 0) > 0 && (
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">Descuento:</span>
+                                                <span className="font-medium text-red-600">
+                                                    -{formatPrice(watch('descuento') || 0)}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {(watch('montoTotal') || 0) > 0 && (
+                                            <div className="flex justify-between">
                                                 <span className="font-medium">Monto total:</span>
                                                 <span className="font-bold text-lg text-green-600">
                                                     {formatPrice(watch('montoTotal') || 0)}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {(watch('saldo') || 0) > 0 && (
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">Saldo:</span>
+                                                <span className="font-medium text-orange-600">
+                                                    {formatPrice(watch('saldo') || 0)}
                                                 </span>
                                             </div>
                                         )}
@@ -786,10 +907,18 @@ export default function EditOrderPage() {
                                         <CardTitle>Información Original</CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-2 text-sm text-muted-foreground">
-                                        <p>
-                                            <span className="font-medium">Creado:</span>{' '}
-                                            {new Date(order.creadoEn).toLocaleDateString('es-CO')}
-                                        </p>
+                                        {order.registro && (
+                                            <p>
+                                                <span className="font-medium">Registrado:</span>{' '}
+                                                {new Date(order.registro).toLocaleDateString('es-CO')}
+                                            </p>
+                                        )}
+                                        {order.usuario && (
+                                            <p>
+                                                <span className="font-medium">Usuario:</span>{' '}
+                                                {order.usuario}
+                                            </p>
+                                        )}
                                     </CardContent>
                                 </Card>
 

@@ -53,7 +53,7 @@ export default function OrderDetailsPage() {
 
             // Fetch product details for all items
             if (itemsData.length > 0) {
-                const productIds = [...new Set(itemsData.map(item => item.productoId))];
+                const productIds = [...new Set(itemsData.map(item => item.idProducto))];
                 const productsData = await Promise.all(
                     productIds.map(id => productService.getProducto(id).catch(() => null))
                 );
@@ -199,6 +199,35 @@ export default function OrderDetailsPage() {
                                             </label>
                                             <p className="mt-1 text-lg font-medium">#{order.id}</p>
                                         </div>
+                                        {order.numeroFactura && (
+                                            <div>
+                                                <label className="text-sm font-medium text-muted-foreground">
+                                                    Número de Factura
+                                                </label>
+                                                <p className="mt-1 text-lg font-medium">{order.numeroFactura}</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="text-sm font-medium text-muted-foreground">
+                                                Subtotal
+                                            </label>
+                                            <p className="mt-1 text-lg font-semibold">
+                                                {formatPrice(order.subTotal)}
+                                            </p>
+                                        </div>
+                                        {order.descuento && order.descuento > 0 && (
+                                            <div>
+                                                <label className="text-sm font-medium text-muted-foreground">
+                                                    Descuento
+                                                </label>
+                                                <p className="mt-1 text-lg font-semibold text-red-600">
+                                                    -{formatPrice(order.descuento)}
+                                                </p>
+                                            </div>
+                                        )}
                                         <div>
                                             <label className="text-sm font-medium text-muted-foreground">
                                                 Monto Total
@@ -208,6 +237,17 @@ export default function OrderDetailsPage() {
                                             </p>
                                         </div>
                                     </div>
+
+                                    {order.saldo && order.saldo > 0 && (
+                                        <div>
+                                            <label className="text-sm font-medium text-muted-foreground">
+                                                Saldo Pendiente
+                                            </label>
+                                            <p className="mt-1 text-xl font-bold text-orange-600">
+                                                {formatPrice(order.saldo)}
+                                            </p>
+                                        </div>
+                                    )}
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
@@ -231,6 +271,40 @@ export default function OrderDetailsPage() {
                                                 Método de Pago
                                             </label>
                                             <p className="mt-1 text-lg capitalize">{order.metodoPago}</p>
+                                        </div>
+                                    )}
+
+                                    {((order.efectivo && order.efectivo > 0) || (order.transferencia && order.transferencia > 0)) && (
+                                        <div className="grid grid-cols-2 gap-4 pt-3 border-t">
+                                            {order.efectivo && order.efectivo > 0 && (
+                                                <div>
+                                                    <label className="text-sm font-medium text-muted-foreground">
+                                                        Efectivo
+                                                    </label>
+                                                    <p className="mt-1 text-lg font-semibold">
+                                                        {formatPrice(order.efectivo)}
+                                                    </p>
+                                                </div>
+                                            )}
+                                            {order.transferencia && order.transferencia > 0 && (
+                                                <div>
+                                                    <label className="text-sm font-medium text-muted-foreground">
+                                                        Transferencia
+                                                    </label>
+                                                    <p className="mt-1 text-lg font-semibold">
+                                                        {formatPrice(order.transferencia)}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {order.usuario && (
+                                        <div>
+                                            <label className="text-sm font-medium text-muted-foreground">
+                                                Usuario
+                                            </label>
+                                            <p className="mt-1 text-lg">{order.usuario}</p>
                                         </div>
                                     )}
                                 </CardContent>
@@ -268,9 +342,9 @@ export default function OrderDetailsPage() {
                                                         <TableRow key={item.id}>
                                                             <TableCell>
                                                                 <div>
-                                                                    <p className="font-medium">{getProductName(item.productoId)}</p>
+                                                                    <p className="font-medium">{getProductName(item.idProducto)}</p>
                                                                     <p className="text-sm text-muted-foreground">
-                                                                        ID: {item.productoId}
+                                                                        ID: {item.idProducto}
                                                                     </p>
                                                                 </div>
                                                             </TableCell>
@@ -280,19 +354,10 @@ export default function OrderDetailsPage() {
                                                             <TableCell className="text-right">
                                                                 {formatPrice(item.precioUnitario)}
                                                             </TableCell>
-                                                            <TableCell className="text-right font-medium">
-                                                                {formatPrice(item.subtotal)}
-                                                            </TableCell>
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>
                                             </Table>
-                                            <div className="flex justify-between items-center pt-4 border-t">
-                                                <span className="text-lg font-medium">Total de Productos:</span>
-                                                <span className="text-2xl font-bold text-green-600">
-                                                    {formatPrice(orderItems.reduce((sum, item) => sum + item.subtotal, 0))}
-                                                </span>
-                                            </div>
                                         </div>
                                     )}
                                 </CardContent>
@@ -303,15 +368,15 @@ export default function OrderDetailsPage() {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <User className="h-5 w-5" />
-                                        Información del Cliente
+                                        Información de la Entidad
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div>
                                         <label className="text-sm font-medium text-muted-foreground">
-                                            Cliente ID
+                                            Entidad ID
                                         </label>
-                                        <p className="mt-1 text-lg font-medium">#{order.clienteId}</p>
+                                        <p className="mt-1 text-lg font-medium">#{order.idEntidad}</p>
                                     </div>
 
                                     {order.direccionEnvio && (
@@ -326,7 +391,7 @@ export default function OrderDetailsPage() {
                             </Card>
 
                             {/* Shipping Information */}
-                            {(order.metodoEnvioId || order.fechaEnvio) && (
+                            {(order.idEnvio || order.fechaEntrega) && (
                                 <Card>
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
@@ -335,22 +400,22 @@ export default function OrderDetailsPage() {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        {order.metodoEnvioId && (
+                                        {order.idEnvio && (
                                             <div>
                                                 <label className="text-sm font-medium text-muted-foreground">
                                                     Método de Envío
                                                 </label>
-                                                <p className="mt-1 text-lg">Método ID: {order.metodoEnvioId}</p>
+                                                <p className="mt-1 text-lg">Método ID: {order.idEnvio}</p>
                                             </div>
                                         )}
 
-                                        {order.fechaEnvio && (
+                                        {order.fechaEntrega && (
                                             <div>
                                                 <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                                                     <Calendar className="h-4 w-4" />
-                                                    Fecha de Envío
+                                                    Fecha de Entrega
                                                 </label>
-                                                <p className="mt-1 text-lg">{formatDate(order.fechaEnvio)}</p>
+                                                <p className="mt-1 text-lg">{formatDate(order.fechaEntrega)}</p>
                                             </div>
                                         )}
                                     </CardContent>
@@ -358,7 +423,7 @@ export default function OrderDetailsPage() {
                             )}
 
                             {/* Coupon Information */}
-                            {order.cuponId && (
+                            {order.idCupon && (
                                 <Card>
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
@@ -371,7 +436,7 @@ export default function OrderDetailsPage() {
                                             <label className="text-sm font-medium text-muted-foreground">
                                                 ID del Cupón
                                             </label>
-                                            <p className="mt-1 text-lg font-medium">#{order.cuponId}</p>
+                                            <p className="mt-1 text-lg font-medium">#{order.idCupon}</p>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -390,9 +455,15 @@ export default function OrderDetailsPage() {
                                         <span className="text-sm text-muted-foreground">ID del pedido</span>
                                         <span className="font-medium">#{order.id}</span>
                                     </div>
+                                    {order.numeroFactura && (
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm text-muted-foreground">Núm. Factura</span>
+                                            <span className="font-medium">{order.numeroFactura}</span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between items-center">
-                                        <span className="text-sm text-muted-foreground">Cliente ID</span>
-                                        <span className="font-medium">#{order.clienteId}</span>
+                                        <span className="text-sm text-muted-foreground">Entidad ID</span>
+                                        <span className="font-medium">#{order.idEntidad}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-sm text-muted-foreground">Productos</span>
@@ -407,11 +478,33 @@ export default function OrderDetailsPage() {
                                         {getStatusBadge(order.estadoPago, 'payment')}
                                     </div>
                                     <div className="flex justify-between items-center pt-3 border-t">
+                                        <span className="text-sm text-muted-foreground">Subtotal</span>
+                                        <span className="font-medium">
+                                            {formatPrice(order.subTotal)}
+                                        </span>
+                                    </div>
+                                    {order.descuento && order.descuento > 0 && (
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm text-muted-foreground">Descuento</span>
+                                            <span className="font-medium text-red-600">
+                                                -{formatPrice(order.descuento)}
+                                            </span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-center">
                                         <span className="text-sm font-medium">Monto Total</span>
                                         <span className="font-bold text-lg text-green-600">
                                             {formatPrice(order.montoTotal)}
                                         </span>
                                     </div>
+                                    {order.saldo && order.saldo > 0 && (
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm text-muted-foreground">Saldo</span>
+                                            <span className="font-semibold text-orange-600">
+                                                {formatPrice(order.saldo)}
+                                            </span>
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
 
@@ -421,10 +514,24 @@ export default function OrderDetailsPage() {
                                     <CardTitle>Línea de Tiempo</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3 text-sm">
-                                    <div>
-                                        <p className="text-muted-foreground">Creado</p>
-                                        <p className="font-medium">{formatDate(order.creadoEn)}</p>
-                                    </div>
+                                    {order.registro && (
+                                        <div>
+                                            <p className="text-muted-foreground">Registrado</p>
+                                            <p className="font-medium">{formatDate(order.registro)}</p>
+                                        </div>
+                                    )}
+                                    {order.fechaEntrega && (
+                                        <div>
+                                            <p className="text-muted-foreground">Fecha de Entrega</p>
+                                            <p className="font-medium">{formatDate(order.fechaEntrega)}</p>
+                                        </div>
+                                    )}
+                                    {order.usuario && (
+                                        <div>
+                                            <p className="text-muted-foreground">Usuario</p>
+                                            <p className="font-medium">{order.usuario}</p>
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
 
