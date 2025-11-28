@@ -18,6 +18,7 @@ import { orderService } from '@/services/api/orders';
 import { orderItemService, type PedidoDetalle } from '@/services/api/order-items';
 import { productService } from '@/services/api/products';
 import type { PedidosResponse, Producto } from '@/types/shop';
+import Header from '@/components/layout/header';
 
 export default function OrderDetailsPage() {
   const params = useParams();
@@ -149,6 +150,11 @@ export default function OrderDetailsPage() {
   }
 
   return (
+    <div className="min-h-screen bg-gray-100">
+            {/* Admin Header */}
+        <Header />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -446,6 +452,8 @@ export default function OrderDetailsPage() {
           </Card>
         </div>
       </div>
+    </div>
+    </div>
     </div>
   );
 }
