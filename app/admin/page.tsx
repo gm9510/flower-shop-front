@@ -1,5 +1,5 @@
 import Header from '@/components/layout/header';
-import OrdersTable from '@/components/admin/OrdersTable';
+import OrdersTable from '@/components/admin/orders/OrdersTable';
 import QuickActions from '@/components/admin/QuickActions';
 import StatsCards from '@/components/admin/StatsCards';
 

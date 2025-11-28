@@ -9,27 +9,27 @@ export const clientService = {
     nombre?: string;
     email?: string;
   }): Promise<Cliente[]> {
-    return apiClient.get<Cliente[]>('/clientes', params);
+    return apiClient.get<Cliente[]>('/api/entidades/', params);
   },
 
   // Create new client
   async createCliente(clientData: ClienteCreate): Promise<Cliente> {
-    return apiClient.post<Cliente>('/clientes', clientData);
+    return apiClient.post<Cliente>('/api/entidades/', clientData);
   },
 
-  // Get single client by ID (assuming endpoint exists)
+  // Get single client by ID
   async getCliente(id: number): Promise<Cliente> {
-    return apiClient.get<Cliente>(`/clientes/${id}`);
+    return apiClient.get<Cliente>(`/api/entidades/${id}`);
   },
 
-  // Update client (assuming endpoint exists)
+  // Update client
   async updateCliente(id: number, updates: Partial<ClienteCreate>): Promise<Cliente> {
-    return apiClient.put<Cliente>(`/clientes/${id}`, updates);
+    return apiClient.put<Cliente>(`/api/entidades/${id}`, updates);
   },
 
-  // Delete client (assuming endpoint exists)
+  // Delete client
   async deleteCliente(id: number): Promise<void> {
-    return apiClient.delete<void>(`/clientes/${id}`);
+    return apiClient.delete<void>(`/api/entidades/${id}`);
   },
 
   // Search clients by email

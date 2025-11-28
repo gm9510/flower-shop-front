@@ -32,7 +32,7 @@ export default function CreateOrderDrawer({ children }: CreateOrderDrawerProps) 
   };
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen} direction="left">
+    <Drawer open={isOpen} onOpenChange={setIsOpen} direction="right">
       <DrawerTrigger asChild>
         {children || (
           <Button className="w-full h-auto p-4 justify-start">

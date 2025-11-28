@@ -24,7 +24,7 @@ interface AuthResponse {
 export const authService = {
   // Login
   async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {
-    const response = await apiClient.post<ApiResponse<AuthResponse>>('/auth/login', credentials);
+    const response = await apiClient.post<ApiResponse<AuthResponse>>('/api/auth/login', credentials);
     
     if (response.success && response.data.token) {
       localStorage.setItem('authToken', response.data.token);
@@ -37,7 +37,7 @@ export const authService = {
 
   // Register
   async register(userData: RegisterData): Promise<ApiResponse<AuthResponse>> {
-    const response = await apiClient.post<ApiResponse<AuthResponse>>('/auth/register', userData);
+    const response = await apiClient.post<ApiResponse<AuthResponse>>('/api/auth/register', userData);
     
     if (response.success && response.data.token) {
       localStorage.setItem('authToken', response.data.token);
@@ -51,7 +51,7 @@ export const authService = {
   // Logout
   async logout(): Promise<void> {
     try {
-      await apiClient.post('/auth/logout');
+      await apiClient.post('/api/auth/logout');
     } finally {
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
@@ -67,7 +67,7 @@ export const authService = {
       throw new Error('No refresh token available');
     }
 
-    const response = await apiClient.post<ApiResponse<{ token: string; refreshToken: string }>>('/auth/refresh', {
+    const response = await apiClient.post<ApiResponse<{ token: string; refreshToken: string }>>('/api/auth/refresh', {
       refreshToken,
     });
 
@@ -81,12 +81,12 @@ export const authService = {
 
   // Get current user
   async getCurrentUser(): Promise<ApiResponse<Cliente>> {
-    return apiClient.get<ApiResponse<Cliente>>('/auth/me');
+    return apiClient.get<ApiResponse<Cliente>>('/api/auth/me');
   },
 
   // Update profile
   async updateProfile(updates: Partial<Cliente>): Promise<ApiResponse<Cliente>> {
-    const response = await apiClient.patch<ApiResponse<Cliente>>('/auth/profile', updates);
+    const response = await apiClient.patch<ApiResponse<Cliente>>('/api/auth/profile', updates);
     
     if (response.success) {
       localStorage.setItem('user', JSON.stringify(response.data));
@@ -100,12 +100,12 @@ export const authService = {
     currentPassword: string;
     newPassword: string;
   }): Promise<ApiResponse<void>> {
-    return apiClient.post<ApiResponse<void>>('/auth/change-password', data);
+    return apiClient.post<ApiResponse<void>>('/api/auth/change-password', data);
   },
 
   // Forgot password
   async forgotPassword(email: string): Promise<ApiResponse<void>> {
-    return apiClient.post<ApiResponse<void>>('/auth/forgot-password', { email });
+    return apiClient.post<ApiResponse<void>>('/api/auth/forgot-password', { email });
   },
 
   // Reset password
@@ -113,7 +113,7 @@ export const authService = {
     token: string;
     password: string;
   }): Promise<ApiResponse<void>> {
-    return apiClient.post<ApiResponse<void>>('/auth/reset-password', data);
+    return apiClient.post<ApiResponse<void>>('/api/auth/reset-password', data);
   },
 
   // Check if user is authenticated

@@ -1,0 +1,151 @@
+import { apiClient } from '@/lib/api';
+import type { 
+  Producto, 
+  ProductoCreate, 
+  Categoria, 
+  CategoriaCreate,
+  Cart, 
+  CartItem,
+  Inventario,
+  Cupon,
+  MetodoEnvio
+} from '@/types/shop';
+
+export const productService = {
+  // Get all products with optional filtering
+  async getProductos(params?: {
+    skip?: number;
+    limit?: number;
+    tipo?: string;
+    estado?: string;
+    categoria?: number;
+  }): Promise<Producto[]> {
+    return apiClient.get<Producto[]>('/api/productos/', params);
+  },
+
+  // Create new product
+  async createProducto(productData: ProductoCreate): Promise<Producto> {
+    return apiClient.post<Producto>('/api/productos/', productData);
+  },
+
+  // Get single product by ID
+  async getProducto(id: number): Promise<Producto> {
+    return apiClient.get<Producto>(`/api/productos/${id}`);
+  },
+
+  // Update product
+  async updateProducto(id: number, updates: Partial<ProductoCreate>): Promise<Producto> {
+    return apiClient.put<Producto>(`/api/productos/${id}`, updates);
+  },
+
+  // Delete product
+  async deleteProducto(id: number): Promise<void> {
+    return apiClient.delete<void>(`/api/productos/${id}`);
+  },
+};
+
+export const inventoryService = {
+  // Get inventory with optional filtering
+  async getInventario(params?: {
+    skip?: number;
+    limit?: number;
+    producto_id?: number;
+    stock_minimo?: number;
+  }): Promise<Inventario[]> {
+    return apiClient.get<Inventario[]>('/api/inventarios/', params);
+  },
+
+  // Create new inventory entry
+  async createInventario(inventoryData: {
+    productoId: number;
+    cantidadStock: number;
+    cantidadMinima: number;
+  }): Promise<Inventario> {
+    return apiClient.post<Inventario>('/api/inventarios/', inventoryData);
+  },
+
+  // Update inventory
+  async updateInventario(id: number, updates: {
+    cantidadStock?: number;
+    cantidadMinima?: number;
+  }): Promise<Inventario> {
+    return apiClient.put<Inventario>(`/api/inventarios/${id}`, updates);
+  },
+};
+
+// Note: couponService and shippingService are in their respective files
+// Import them from there if needed
+
+// Keep cart service for frontend state management
+export const cartService = {
+  // These would be local storage or state management operations
+  // since the backend doesn't seem to have cart endpoints
+  
+  getCart(): Cart {
+    if (typeof window === 'undefined') return { items: [], total: 0, itemCount: 0 };
+    
+    const stored = localStorage.getItem('cart');
+    return stored ? JSON.parse(stored) : { items: [], total: 0, itemCount: 0 };
+  },
+
+  saveCart(cart: Cart): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('cart', JSON.stringify(cart));
+  },
+
+  addToCart(producto: Producto, quantity: number = 1): Cart {
+    const cart = this.getCart();
+    const existingItem = cart.items.find(item => item.producto.id === producto.id);
+
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cart.items.push({
+        id: `${producto.id}-${Date.now()}`,
+        producto,
+        quantity,
+      });
+    }
+
+    cart.total = cart.items.reduce((sum, item) => sum + (item.producto.precioVenta * item.quantity), 0);
+    cart.itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+
+    this.saveCart(cart);
+    return cart;
+  },
+
+  removeFromCart(itemId: string): Cart {
+    const cart = this.getCart();
+    cart.items = cart.items.filter(item => item.id !== itemId);
+    
+    cart.total = cart.items.reduce((sum, item) => sum + (item.producto.precioVenta * item.quantity), 0);
+    cart.itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+
+    this.saveCart(cart);
+    return cart;
+  },
+
+  updateCartItem(itemId: string, quantity: number): Cart {
+    const cart = this.getCart();
+    const item = cart.items.find(item => item.id === itemId);
+
+    if (item) {
+      item.quantity = quantity;
+      if (item.quantity <= 0) {
+        return this.removeFromCart(itemId);
+      }
+    }
+
+    cart.total = cart.items.reduce((sum, item) => sum + (item.producto.precioVenta * item.quantity), 0);
+    cart.itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+
+    this.saveCart(cart);
+    return cart;
+  },
+
+  clearCart(): Cart {
+    const emptyCart = { items: [], total: 0, itemCount: 0 };
+    this.saveCart(emptyCart);
+    return emptyCart;
+  },
+};

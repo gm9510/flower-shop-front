@@ -32,6 +32,7 @@ const mockOrders: PedidosResponse[] = [
     estadoPago: 'pagado',
     metodoPago: 'tarjeta_credito',
     direccionEnvio: 'Av. Principal 123',
+    fechaEnvio: '2024-11-01T10:00:00Z',
     creadoEn: '2024-11-01T10:00:00Z'
   },
   { 
@@ -42,6 +43,7 @@ const mockOrders: PedidosResponse[] = [
     estadoPago: 'pagado',
     metodoPago: 'transferencia',
     direccionEnvio: 'Calle Secundaria 456',
+    fechaEnvio: '2024-11-02T12:00:00Z',
     creadoEn: '2024-10-31T15:30:00Z'
   },
   { 
@@ -52,6 +54,7 @@ const mockOrders: PedidosResponse[] = [
     estadoPago: 'pagado',
     metodoPago: 'efectivo',
     direccionEnvio: 'Plaza Central 789',
+    fechaEnvio: '2024-11-01T14:00:00Z',
     creadoEn: '2024-10-30T09:15:00Z'
   },
   { 
@@ -62,6 +65,7 @@ const mockOrders: PedidosResponse[] = [
     estadoPago: 'pendiente',
     metodoPago: 'tarjeta_debito',
     direccionEnvio: 'Barrio Norte 321',
+    fechaEnvio: '2024-11-02T12:00:00Z',
     creadoEn: '2024-10-30T14:45:00Z'
   },
 ];
@@ -162,7 +166,8 @@ export default function OrdersTable({
 
   const handleStatusUpdate = async (orderId: number, newStatus: string) => {
     try {
-      await orderService.updatePedidoEstado(orderId, { estado_pedido: newStatus });
+      const order = await orderService.getPedido(orderId);
+      await orderService.updatePedido(orderId, { ...order, estadoPedido: newStatus });
       
       // Update local state
       setOrdersData(prevOrders => 

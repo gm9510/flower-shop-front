@@ -9,7 +9,6 @@ interface PageHeaderProps {
   description: string;
   onFilterClick?: () => void;
   onExportClick?: () => void;
-  onNewOrderClick?: () => void;
 }
 
 export default function PageHeader({
@@ -17,7 +16,6 @@ export default function PageHeader({
   description,
   onFilterClick,
   onExportClick,
-  onNewOrderClick
 }: PageHeaderProps) {
   const router = useRouter();
 
@@ -44,15 +42,11 @@ export default function PageHeader({
 
         {/* Action Buttons */}
         <div className="flex items-center space-x-3">
-          <Button variant="outline" size="sm" onClick={onFilterClick}>
-            <Filter className="h-4 w-4 mr-2" />
-            Filtrar
-          </Button>
           <Button variant="outline" size="sm" onClick={onExportClick}>
             <Download className="h-4 w-4 mr-2" />
             Exportar
           </Button>
-          <Button size="sm" onClick={onNewOrderClick}>
+          <Button size="sm" onClick={() => router.push('/admin/orders/create')}>
             <Plus className="h-4 w-4 mr-2" />
             Nuevo Pedido
           </Button>
