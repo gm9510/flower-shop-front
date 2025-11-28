@@ -3,14 +3,12 @@
 import { Button } from '@/components/ui/button';
 import { Filter, Download, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import CreateOrderDrawer from '@/components/admin/CreateOrderDrawer';
 
 interface PageHeaderProps {
   title: string;
   description: string;
   onFilterClick?: () => void;
   onExportClick?: () => void;
-  onNewOrderClick?: () => void;
 }
 
 export default function PageHeader({
@@ -18,7 +16,6 @@ export default function PageHeader({
   description,
   onFilterClick,
   onExportClick,
-  onNewOrderClick
 }: PageHeaderProps) {
   const router = useRouter();
 
@@ -49,12 +46,10 @@ export default function PageHeader({
             <Download className="h-4 w-4 mr-2" />
             Exportar
           </Button>
-          <CreateOrderDrawer>
-              <Button size="sm" onClick={onNewOrderClick}>
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Pedido
-              </Button>
-          </CreateOrderDrawer>
+          <Button size="sm" onClick={() => router.push('/admin/orders/create')}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nuevo Pedido
+          </Button>
         </div>
       </div>
     </div>

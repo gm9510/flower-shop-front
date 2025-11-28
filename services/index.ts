@@ -3,7 +3,7 @@ export {
   productService, 
   categoryService, 
   inventoryService 
-} from './api/flowers';
+} from './api/products';
 export { orderService } from './api/orders';
 export { authService } from './api/auth';
 export { clientService } from './api/clients';

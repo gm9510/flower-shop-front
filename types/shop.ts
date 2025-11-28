@@ -16,6 +16,14 @@ export interface ProductoCreate {
   imagenUrl?: string;
 }
 
+export interface ProductoUpdate {
+  nombre?: string;
+  descripcion?: string;
+  precio?: number;
+  categoriaId?: number;
+  imagenUrl?: string;
+}
+
 // Category Types (based on backend CategoriaResponse)
 export interface Categoria {
   id: number;

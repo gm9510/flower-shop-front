@@ -6,8 +6,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import SearchAndFilter from '@/components/admin/orders/SearchAndFilter';
 import PageHeader from '@/components/admin/orders/PageHeader';
 import OrdersTable from '@/components/admin/orders/Table';
-import ViewOrderDrawer from '@/components/admin/ViewOrderDrawer';
-import EditOrderDrawer from '@/components/admin/EditOrderDrawer';
 import { orderService } from '@/services/api/orders';
 import type { PedidosResponse } from '@/types/shop';
 import { useRouter } from 'next/navigation';
@@ -27,12 +25,6 @@ export default function OrdersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [error, setError] = useState<string | null>(null);
-
-  // Drawer states
-  const [viewOrderId, setViewOrderId] = useState<number | null>(null);
-  const [isViewDrawerOpen, setIsViewDrawerOpen] = useState(false);
-  const [editOrderId, setEditOrderId] = useState<number | null>(null);
-  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 
   // Fetch orders function
   const fetchOrders = async (page = 1) => {
@@ -115,23 +107,15 @@ export default function OrdersPage() {
   };
 
   const handleNewOrderClick = () => {
-    console.log('New order clicked');
-    // TODO: Open create order modal or navigate to create page
+    router.push('/admin/orders/create');
   };
 
   const handleViewOrder = (orderId: number) => {
-    setViewOrderId(orderId);
-    setIsViewDrawerOpen(true);
+    router.push(`/admin/orders/${orderId}`);
   };
 
   const handleEditOrder = (orderId: number) => {
-    setEditOrderId(orderId);
-    setIsEditDrawerOpen(true);
-  };
-
-  const handleEditSuccess = () => {
-    // Refresh orders list after successful edit
-    fetchOrders(currentPage);
+    router.push(`/admin/orders/${orderId}/edit`);
   };
 
   const handleDateRangeChange = (start: string, end: string) => {
@@ -151,7 +135,6 @@ export default function OrdersPage() {
           description="Administra todos los pedidos de la floristería"
           onFilterClick={handleFilterClick}
           onExportClick={handleExportClick}
-          onNewOrderClick={handleNewOrderClick}
         />
 
         {/* Search and Filters */}
@@ -183,21 +166,6 @@ export default function OrdersPage() {
           onViewOrder={handleViewOrder}
           onEditOrder={handleEditOrder}
           onPageChange={handlePageChange}
-        />
-
-        {/* View Order Drawer */}
-        <ViewOrderDrawer
-          orderId={viewOrderId}
-          isOpen={isViewDrawerOpen}
-          onClose={() => setIsViewDrawerOpen(false)}
-        />
-
-        {/* Edit Order Drawer */}
-        <EditOrderDrawer
-          orderId={editOrderId}
-          isOpen={isEditDrawerOpen}
-          onClose={() => setIsEditDrawerOpen(false)}
-          onSuccess={handleEditSuccess}
         />
       </div>
     </div>
