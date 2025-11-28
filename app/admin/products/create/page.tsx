@@ -16,7 +16,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import Header from '@/components/layout/header';
-import { productService, categoryService } from '@/services';
+import { productService } from '@/services';
 import type { Categoria, ProductoCreate } from '@/types/shop';
 
 export default function CreateProductPage() {
@@ -28,29 +28,14 @@ export default function CreateProductPage() {
     // Product form data
     const [nombre, setNombre] = useState('');
     const [descripcion, setDescripcion] = useState('');
-    const [precio, setPrecio] = useState('');
-    const [categoriaId, setCategoriaId] = useState<string>('');
+    const [precioVenta, setPrecioVenta] = useState('');
+    const [tipo, setTipo] = useState<string>('SIMPLE');
+    const [categoria, setCategoria] = useState<string>('');
+    const [codbarra, setCodbarra] = useState('');
+    const [estado, setEstado] = useState<string>('activo');
     const [imagenUrl, setImagenUrl] = useState('');
 
     // Categories for dropdown
-    const [categories, setCategories] = useState<Categoria[]>([]);
-    const [loadingCategories, setLoadingCategories] = useState(true);
-
-    useEffect(() => {
-        fetchCategories();
-    }, []);
-
-    const fetchCategories = async () => {
-        try {
-            setLoadingCategories(true);
-            const categoriesData = await categoryService.getCategorias();
-            setCategories(categoriesData);
-        } catch (err) {
-            console.error('Failed to fetch categories:', err);
-        } finally {
-            setLoadingCategories(false);
-        }
-    };
 
     const handleCreate = async () => {
         try {
@@ -63,7 +48,7 @@ export default function CreateProductPage() {
                 return;
             }
 
-            const precioNum = Number(precio);
+            const precioNum = Number(precioVenta);
             if (isNaN(precioNum) || precioNum < 0) {
                 setError('El precio debe ser un número válido');
                 return;
@@ -73,8 +58,11 @@ export default function CreateProductPage() {
             const createData: ProductoCreate = {
                 nombre: nombre.trim(),
                 descripcion: descripcion.trim() || undefined,
-                precio: precioNum,
-                categoriaId: categoriaId && categoriaId !== '0' ? Number(categoriaId) : undefined,
+                precioVenta: precioNum,
+                tipo: tipo,
+                categoria: categoria.trim() || undefined,
+                codbarra: codbarra.trim() || undefined,
+                estado: estado,
                 imagenUrl: imagenUrl.trim() || undefined,
             };
 
@@ -91,7 +79,7 @@ export default function CreateProductPage() {
     };
 
     const handleCancel = () => {
-        if (nombre || descripcion || precio || imagenUrl) {
+        if (nombre || descripcion || precioVenta || imagenUrl || codbarra || categoria) {
             if (confirm('¿Estás seguro de que deseas cancelar? Se perderán los cambios.')) {
                 router.push('/admin/products');
             }
@@ -171,14 +159,14 @@ export default function CreateProductPage() {
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="precio">Precio de Venta *</Label>
+                                            <Label htmlFor="precioVenta">Precio de Venta *</Label>
                                             <Input
-                                                id="precio"
+                                                id="precioVenta"
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
-                                                value={precio}
-                                                onChange={(e) => setPrecio(e.target.value)}
+                                                value={precioVenta}
+                                                onChange={(e) => setPrecioVenta(e.target.value)}
                                                 placeholder="0.00"
                                                 disabled={loading}
                                             />
@@ -188,25 +176,63 @@ export default function CreateProductPage() {
                                         </div>
 
                                         <div>
-                                            <Label htmlFor="categoria">Categoría</Label>
+                                            <Label htmlFor="tipo">Tipo de Producto *</Label>
                                             <Select
-                                                value={categoriaId}
-                                                onValueChange={setCategoriaId}
-                                                disabled={loading || loadingCategories}
+                                                value={tipo}
+                                                onValueChange={setTipo}
+                                                disabled={loading}
                                             >
-                                                <SelectTrigger id="categoria">
-                                                    <SelectValue placeholder="Seleccionar categoría" />
+                                                <SelectTrigger id="tipo">
+                                                    <SelectValue placeholder="Seleccionar tipo" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="0">Sin categoría</SelectItem>
-                                                    {categories.map((cat) => (
-                                                        <SelectItem key={cat.id} value={cat.id.toString()}>
-                                                            {cat.nombre}
-                                                        </SelectItem>
-                                                    ))}
+                                                    <SelectItem value="SIMPLE">Simple</SelectItem>
+                                                    <SelectItem value="ENSAMBLE">Ensamble</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <Label htmlFor="categoria">Categoría</Label>
+                                            <Input
+                                                id="categoria"
+                                                value={categoria}
+                                                onChange={(e) => setCategoria(e.target.value)}
+                                                placeholder="Ej: Flores, Regalos"
+                                                disabled={loading}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="codbarra">Código de Barras</Label>
+                                            <Input
+                                                id="codbarra"
+                                                value={codbarra}
+                                                onChange={(e) => setCodbarra(e.target.value)}
+                                                placeholder="Código de barras"
+                                                disabled={loading}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="estado">Estado</Label>
+                                        <Select
+                                            value={estado}
+                                            onValueChange={setEstado}
+                                            disabled={loading}
+                                        >
+                                            <SelectTrigger id="estado">
+                                                <SelectValue placeholder="Seleccionar estado" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="activo">Activo</SelectItem>
+                                                <SelectItem value="inactivo">Inactivo</SelectItem>
+                                                <SelectItem value="agotado">Agotado</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
 
                                     <div>

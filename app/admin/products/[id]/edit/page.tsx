@@ -25,13 +25,12 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/layout/header';
-import { productService, categoryService, productAssemblyService } from '@/services';
-import type { Producto, Categoria, ProductoUpdate } from '@/types/shop';
-import type { ProductoEnsamble, ProductoEnsambleCreate } from '@/services/api/product-assemblies';
+import { productService, productAssemblyService } from '@/services';
+import type { Producto, ProductoUpdate, ProductoEnsamble, ProductoEnsambleCreate } from '@/types/shop';
 
 interface ComponentRow {
     id?: number; // undefined for new components
-    productoComponenteId: number;
+    idProductoHijo: number;
     cantidad: number;
     componentName?: string;
     isNew?: boolean;
@@ -49,12 +48,15 @@ export default function EditProductPage() {
     // Product form data
     const [nombre, setNombre] = useState('');
     const [descripcion, setDescripcion] = useState('');
-    const [precio, setPrecio] = useState('');
-    const [categoriaId, setCategoriaId] = useState<string>('');
+    const [precioVenta, setPrecioVenta] = useState('');
+    const [tipo, setTipo] = useState<string>('SIMPLE');
+    const [categoria, setCategoria] = useState<string>('');
+    const [codbarra, setCodbarra] = useState('');
+    const [estado, setEstado] = useState<string>('activo');
     const [imagenUrl, setImagenUrl] = useState('');
+    const [localImagenUrl, setLocalImagenUrl] = useState('');
 
     // Categories and products for dropdowns
-    const [categories, setCategories] = useState<Categoria[]>([]);
     const [allProducts, setAllProducts] = useState<Producto[]>([]);
 
     // Assembly components management
@@ -80,16 +82,16 @@ export default function EditProductPage() {
             const productData = await productService.getProducto(productId);
             setNombre(productData.nombre);
             setDescripcion(productData.descripcion || '');
-            setPrecio(productData.precio.toString());
-            setCategoriaId(productData.categoriaId?.toString() || '');
+            setPrecioVenta(productData.precioVenta.toString());
+            setTipo(productData.tipo || 'SIMPLE');
+            setCategoria(productData.categoria || '');
+            setCodbarra(productData.codbarra || '');
+            setEstado(productData.estado || 'activo');
             setImagenUrl(productData.imagenUrl || '');
-
-            // Fetch categories
-            const categoriesData = await categoryService.getCategorias();
-            setCategories(categoriesData);
+            setLocalImagenUrl(productData.imagenUrl || '');
 
             // Fetch all products for component selection
-            const productsData = await productService.getProductos();
+            const productsData = await productService.getProductos({tipo: 'SIMPLE', estado: 'activo', limit: 100, skip: 0 });
             setAllProducts(productsData.filter(p => p.id !== productId)); // Exclude current product
 
             // Fetch assembly components
@@ -98,10 +100,10 @@ export default function EditProductPage() {
                 const componentsWithDetails = await Promise.all(
                     assemblyData.map(async (comp) => {
                         try {
-                            const componentProduct = await productService.getProducto(comp.productoComponenteId);
+                            const componentProduct = await productService.getProducto(comp.idProductoHijo );
                             return {
                                 id: comp.id,
-                                productoComponenteId: comp.productoComponenteId,
+                                idProductoHijo: comp.idProductoHijo,
                                 cantidad: comp.cantidad,
                                 componentName: componentProduct.nombre,
                                 isNew: false,
@@ -109,7 +111,7 @@ export default function EditProductPage() {
                         } catch (err) {
                             return {
                                 id: comp.id,
-                                productoComponenteId: comp.productoComponenteId,
+                                idProductoHijo: comp.idProductoHijo,
                                 cantidad: comp.cantidad,
                                 componentName: 'Producto no encontrado',
                                 isNew: false,
@@ -137,7 +139,7 @@ export default function EditProductPage() {
         const quantity = Number(newComponentQty);
 
         // Check if component already exists
-        if (components.some(c => c.productoComponenteId === componentIdNum)) {
+        if (components.some(c => c.idProductoHijo === componentIdNum)) {
             alert('Este componente ya está agregado');
             return;
         }
@@ -147,7 +149,7 @@ export default function EditProductPage() {
         setComponents([
             ...components,
             {
-                productoComponenteId: componentIdNum,
+                idProductoHijo: componentIdNum,
                 cantidad: quantity,
                 componentName: product?.nombre || 'Desconocido',
                 isNew: true,
@@ -190,7 +192,7 @@ export default function EditProductPage() {
                 return;
             }
 
-            const precioNum = Number(precio);
+            const precioNum = Number(precioVenta);
             if (isNaN(precioNum) || precioNum < 0) {
                 setError('El precio debe ser un número válido');
                 return;
@@ -200,8 +202,11 @@ export default function EditProductPage() {
             const updateData: ProductoUpdate = {
                 nombre: nombre.trim(),
                 descripcion: descripcion.trim() || undefined,
-                precio: precioNum,
-                categoriaId: categoriaId ? Number(categoriaId) : undefined,
+                precioVenta: precioNum,
+                tipo: tipo,
+                categoria: categoria.trim() || undefined,
+                codbarra: codbarra.trim() || undefined,
+                estado: estado,
                 imagenUrl: imagenUrl.trim() || undefined,
             };
 
@@ -220,8 +225,8 @@ export default function EditProductPage() {
             for (const component of components.filter(c => c.isNew)) {
                 try {
                     const createData: ProductoEnsambleCreate = {
-                        productoEnsambleId: productId,
-                        productoComponenteId: component.productoComponenteId,
+                        idProductoPadre: productId,
+                        idProductoHijo: component.idProductoHijo,
                         cantidad: component.cantidad,
                     };
                     await productAssemblyService.createProductoEnsamble(createData);
@@ -233,9 +238,7 @@ export default function EditProductPage() {
             // Update existing components quantities
             for (const component of components.filter(c => !c.isNew && c.id)) {
                 try {
-                    await productAssemblyService.updateProductoEnsamble(component.id!, {
-                        cantidad: component.cantidad,
-                    });
+                    await productAssemblyService.updateProductoEnsambleCantidad(component.id!, component.cantidad);
                 } catch (err) {
                     console.error(`Failed to update component ${component.id}:`, err);
                 }
@@ -342,34 +345,66 @@ export default function EditProductPage() {
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="precio">Precio de Venta *</Label>
+                                            <Label htmlFor="precioVenta">Precio de Venta *</Label>
                                             <Input
-                                                id="precio"
+                                                id="precioVenta"
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
-                                                value={precio}
-                                                onChange={(e) => setPrecio(e.target.value)}
+                                                value={precioVenta}
+                                                onChange={(e) => setPrecioVenta(e.target.value)}
                                                 placeholder="0.00"
                                             />
                                         </div>
 
                                         <div>
-                                            <Label htmlFor="categoria">Categoría</Label>
-                                            <Select value={categoriaId} onValueChange={setCategoriaId}>
-                                                <SelectTrigger id="categoria">
-                                                    <SelectValue placeholder="Seleccionar categoría" />
+                                            <Label htmlFor="tipo">Tipo de Producto</Label>
+                                            <Select value={tipo} onValueChange={setTipo}>
+                                                <SelectTrigger id="tipo">
+                                                    <SelectValue placeholder="Seleccionar tipo" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="0">Sin categoría</SelectItem>
-                                                    {categories.map((cat) => (
-                                                        <SelectItem key={cat.id} value={cat.id.toString()}>
-                                                            {cat.nombre}
-                                                        </SelectItem>
-                                                    ))}
+                                                    <SelectItem value="SIMPLE">Simple</SelectItem>
+                                                    <SelectItem value="ENSAMBLE">Ensamble</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <Label htmlFor="categoria">Categoría</Label>
+                                            <Input
+                                                id="categoria"
+                                                value={categoria}
+                                                onChange={(e) => setCategoria(e.target.value)}
+                                                placeholder="Ej: Flores, Regalos"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="codbarra">Código de Barras</Label>
+                                            <Input
+                                                id="codbarra"
+                                                value={codbarra}
+                                                onChange={(e) => setCodbarra(e.target.value)}
+                                                placeholder="Código de barras"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="estado">Estado</Label>
+                                        <Select value={estado} onValueChange={setEstado}>
+                                            <SelectTrigger id="estado">
+                                                <SelectValue placeholder="Seleccionar estado" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="activo">Activo</SelectItem>
+                                                <SelectItem value="inactivo">Inactivo</SelectItem>
+                                                <SelectItem value="agotado">Agotado</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
 
                                     <div>
@@ -385,6 +420,7 @@ export default function EditProductPage() {
                             </Card>
 
                             {/* Assembly Components */}
+                            {tipo === 'ENSAMBLE' && (
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
@@ -406,7 +442,7 @@ export default function EditProductPage() {
                                                 <SelectContent>
                                                     {allProducts.map((product) => (
                                                         <SelectItem key={product.id} value={product.id.toString()}>
-                                                            {product.nombre} - ${product.precio.toLocaleString()}
+                                                            {product.nombre} - ${product.precioVenta.toLocaleString()}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -448,7 +484,7 @@ export default function EditProductPage() {
                                                             <TableCell className="font-medium">
                                                                 {component.componentName}
                                                                 <span className="text-xs text-muted-foreground ml-2">
-                                                                    ID: {component.productoComponenteId}
+                                                                    ID: {component.idProductoHijo}
                                                                 </span>
                                                             </TableCell>
                                                             <TableCell>
@@ -486,6 +522,7 @@ export default function EditProductPage() {
                                     )}
                                 </CardContent>
                             </Card>
+                            )}
                         </div>
 
                         {/* Sidebar */}
@@ -496,10 +533,10 @@ export default function EditProductPage() {
                                     <CardTitle>Vista Previa</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    {imagenUrl ? (
+                                    {localImagenUrl ? (
                                         <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
                                             <img
-                                                src={imagenUrl}
+                                                src={ localImagenUrl }
                                                 alt={nombre || 'Producto'}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {

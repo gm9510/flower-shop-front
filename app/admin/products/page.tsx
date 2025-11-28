@@ -23,13 +23,12 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Header from '@/components/layout/header';
-import { productService, categoryService } from '@/services';
-import type { Producto, Categoria } from '@/types/shop';
+import { productService} from '@/services';
+import type { Producto} from '@/types/shop';
 
 export default function ProductsPage() {
     const router = useRouter();
     const [products, setProducts] = useState<Producto[]>([]);
-    const [categories, setCategories] = useState<Categoria[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedType, setSelectedType] = useState<string>('all');
@@ -37,7 +36,6 @@ export default function ProductsPage() {
 
     useEffect(() => {
         fetchProducts();
-        fetchCategories();
     }, []);
 
     const fetchProducts = async () => {
@@ -52,14 +50,6 @@ export default function ProductsPage() {
         }
     };
 
-    const fetchCategories = async () => {
-        try {
-            const data = await categoryService.getCategorias();
-            setCategories(data);
-        } catch (error) {
-            console.error('Failed to fetch categories:', error);
-        }
-    };
 
     // Filter products based on search term, type, and status
     const filteredProducts = products.filter((product) => {
@@ -67,7 +57,7 @@ export default function ProductsPage() {
             .toLowerCase()
             .includes(searchTerm.toLowerCase());
         const matchesType =
-            selectedType === 'all' || product.categoriaId?.toString() === selectedType;
+            selectedType === 'all' || product.tipo?.toString() === selectedType;
         // Mock status logic - you can replace with actual status field
         const hasStock = Math.random() > 0.3; // Mock stock availability
         const matchesStatus =
@@ -77,12 +67,6 @@ export default function ProductsPage() {
 
         return matchesSearch && matchesType && matchesStatus;
     });
-
-    const getCategoryName = (categoryId?: number) => {
-        if (!categoryId) return 'Sin categoría';
-        const category = categories.find((cat) => cat.id === categoryId);
-        return category?.nombre || 'Desconocido';
-    };
 
     const getStatusBadge = (productId: number) => {
         // Mock status - replace with actual inventory/status logic
@@ -154,11 +138,6 @@ export default function ProductsPage() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">Todos los tipos</SelectItem>
-                                        {categories.map((category) => (
-                                            <SelectItem key={category.id} value={category.id.toString()}>
-                                                {category.nombre}
-                                            </SelectItem>
-                                        ))}
                                     </SelectContent>
                                 </Select>
 
@@ -210,8 +189,8 @@ export default function ProductsPage() {
                                                     <TableCell className="font-medium">
                                                         {product.nombre}
                                                     </TableCell>
-                                                    <TableCell>{getCategoryName(product.categoriaId)}</TableCell>
-                                                    <TableCell>{formatPrice(product.precio)}</TableCell>
+                                                    <TableCell>{product.tipo}</TableCell>
+                                                    <TableCell>{formatPrice(product.precioVenta)}</TableCell>
                                                     <TableCell>{getStatusBadge(product.id)}</TableCell>
                                                     <TableCell className="text-right">
                                                         <Button

@@ -1,30 +1,13 @@
 import { apiClient } from '@/lib/api';
-
-// Product Assembly (ProductoEnsamble) Types
-export interface ProductoEnsamble {
-  id: number;
-  productoEnsambleId: number;
-  productoComponenteId: number;
-  cantidad: number;
-}
-
-export interface ProductoEnsambleCreate {
-  productoEnsambleId: number;
-  productoComponenteId: number;
-  cantidad: number;
-}
-
-export interface ProductoEnsambleUpdate {
-  cantidad?: number;
-}
+import type { ProductoEnsamble, ProductoEnsambleCreate, ProductoEnsambleUpdate } from '@/types/shop';
 
 export const productAssemblyService = {
   // Get all product assemblies
   async getProductoEnsambles(params?: {
     skip?: number;
     limit?: number;
-    producto_ensamble_id?: number;
-    producto_componente_id?: number;
+    idProductoPadre?: number;
+    idProductoHijo?: number;
   }): Promise<ProductoEnsamble[]> {
     return apiClient.get<ProductoEnsamble[]>('/api/productoensambles/', params);
   },
@@ -44,18 +27,23 @@ export const productAssemblyService = {
     return apiClient.put<ProductoEnsamble>(`/api/productoensambles/${id}`, updates);
   },
 
+  // Update product assembly quantity (PATCH)
+  async updateProductoEnsambleCantidad(id: number, cantidad: number): Promise<ProductoEnsamble> {
+    return apiClient.patch<ProductoEnsamble>(`/api/productoensambles/${id}/cantidad?cantidad=${cantidad}`);
+  },
+
   // Delete product assembly
   async deleteProductoEnsamble(id: number): Promise<void> {
     return apiClient.delete<void>(`/api/productoensambles/${id}`);
   },
 
-  // Get components for an assembled product
-  async getComponentsByEnsamble(ensambleId: number): Promise<ProductoEnsamble[]> {
-    return this.getProductoEnsambles({ producto_ensamble_id: ensambleId });
+  // Get components for an assembled product (children)
+  async getComponentsByEnsamble(parentId: number): Promise<ProductoEnsamble[]> {
+    return this.getProductoEnsambles({ idProductoPadre: parentId });
   },
 
-  // Get assemblies that use a specific component
-  async getEnsamblesByComponente(componenteId: number): Promise<ProductoEnsamble[]> {
-    return this.getProductoEnsambles({ producto_componente_id: componenteId });
+  // Get assemblies that use a specific component (parents)
+  async getEnsamblesByComponente(childId: number): Promise<ProductoEnsamble[]> {
+    return this.getProductoEnsambles({ idProductoHijo: childId });
   },
 };

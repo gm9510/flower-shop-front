@@ -16,9 +16,9 @@ export const productService = {
   async getProductos(params?: {
     skip?: number;
     limit?: number;
-    categoria_id?: number;
-    precio_min?: number;
-    precio_max?: number;
+    tipo?: string;
+    estado?: string;
+    categoria?: number;
   }): Promise<Producto[]> {
     return apiClient.get<Producto[]>('/api/productos/', params);
   },
@@ -41,36 +41,6 @@ export const productService = {
   // Delete product
   async deleteProducto(id: number): Promise<void> {
     return apiClient.delete<void>(`/api/productos/${id}`);
-  },
-};
-
-export const categoryService = {
-  // Get all categories
-  async getCategorias(params?: {
-    skip?: number;
-    limit?: number;
-  }): Promise<Categoria[]> {
-    return apiClient.get<Categoria[]>('/categorias', params);
-  },
-
-  // Create new category
-  async createCategoria(categoryData: CategoriaCreate): Promise<Categoria> {
-    return apiClient.post<Categoria>('/categorias', categoryData);
-  },
-
-  // Get single category by ID (assuming endpoint exists)
-  async getCategoria(id: number): Promise<Categoria> {
-    return apiClient.get<Categoria>(`/categorias/${id}`);
-  },
-
-  // Update category (assuming endpoint exists)
-  async updateCategoria(id: number, updates: Partial<CategoriaCreate>): Promise<Categoria> {
-    return apiClient.put<Categoria>(`/categorias/${id}`, updates);
-  },
-
-  // Delete category (assuming endpoint exists)
-  async deleteCategoria(id: number): Promise<void> {
-    return apiClient.delete<void>(`/categorias/${id}`);
   },
 };
 
@@ -137,7 +107,7 @@ export const cartService = {
       });
     }
 
-    cart.total = cart.items.reduce((sum, item) => sum + (item.producto.precio * item.quantity), 0);
+    cart.total = cart.items.reduce((sum, item) => sum + (item.producto.precioVenta * item.quantity), 0);
     cart.itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
     this.saveCart(cart);
@@ -148,7 +118,7 @@ export const cartService = {
     const cart = this.getCart();
     cart.items = cart.items.filter(item => item.id !== itemId);
     
-    cart.total = cart.items.reduce((sum, item) => sum + (item.producto.precio * item.quantity), 0);
+    cart.total = cart.items.reduce((sum, item) => sum + (item.producto.precioVenta * item.quantity), 0);
     cart.itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
     this.saveCart(cart);
@@ -166,7 +136,7 @@ export const cartService = {
       }
     }
 
-    cart.total = cart.items.reduce((sum, item) => sum + (item.producto.precio * item.quantity), 0);
+    cart.total = cart.items.reduce((sum, item) => sum + (item.producto.precioVenta * item.quantity), 0);
     cart.itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
     this.saveCart(cart);

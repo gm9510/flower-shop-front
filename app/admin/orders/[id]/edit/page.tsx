@@ -198,8 +198,8 @@ export default function EditOrderPage() {
                 pedidoId: orderId,
                 productoId: newItem.productoId,
                 cantidad: newItem.cantidad,
-                precioUnitario: newItem.precioUnitario || product.precio,
-                subtotal: newItem.cantidad * (newItem.precioUnitario || product.precio),
+                precioUnitario: newItem.precioUnitario || product.precioVenta,
+                subtotal: newItem.cantidad * (newItem.precioUnitario || product.precioVenta),
             });
 
             // Add to local state
@@ -523,7 +523,7 @@ export default function EditOrderPage() {
                                                                 setNewItem({
                                                                     ...newItem,
                                                                     productoId: productId,
-                                                                    precioUnitario: product?.precio || 0,
+                                                                    precioUnitario: product?.precioVenta || 0,
                                                                 });
                                                             }}
                                                         >
@@ -533,7 +533,7 @@ export default function EditOrderPage() {
                                                             <SelectContent>
                                                                 {products.map((product) => (
                                                                     <SelectItem key={product.id} value={product.id.toString()}>
-                                                                        {product.nombre} - {formatPrice(product.precio)}
+                                                                        {product.nombre} - {formatPrice(product.precioVenta)}
                                                                     </SelectItem>
                                                                 ))}
                                                             </SelectContent>

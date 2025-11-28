@@ -2,25 +2,34 @@
 export interface Producto {
   id: number;
   nombre: string;
+  precioVenta: number;
+  tipo: 'SIMPLE' | 'ENSAMBLE' | string;
+  categoria?: string;
+  codbarra?: string;
+  estado?: string;
   descripcion?: string;
-  precio: number;
-  categoriaId?: number;
   imagenUrl?: string;
 }
 
 export interface ProductoCreate {
   nombre: string;
+  precioVenta: number;
+  tipo: 'SIMPLE' | 'ENSAMBLE' | string;
+  categoria?: string;
+  codbarra?: string;
+  estado?: string;
   descripcion?: string;
-  precio: number;
-  categoriaId?: number;
   imagenUrl?: string;
 }
 
 export interface ProductoUpdate {
   nombre?: string;
+  precioVenta?: number;
+  tipo?: 'SIMPLE' | 'ENSAMBLE' | string;
+  categoria?: string;
+  codbarra?: string;
+  estado?: string;
   descripcion?: string;
-  precio?: number;
-  categoriaId?: number;
   imagenUrl?: string;
 }
 
@@ -146,6 +155,26 @@ export interface MetodoEnvio {
   descripcion?: string;
   costo: number;
   tiempoEstimado?: string;
+}
+
+// Product Assembly Types
+export interface ProductoEnsamble {
+  id: number;
+  idProductoPadre: number;
+  idProductoHijo: number;
+  cantidad: number;
+}
+
+export interface ProductoEnsambleCreate {
+  idProductoPadre: number;
+  idProductoHijo: number;
+  cantidad: number;
+}
+
+export interface ProductoEnsambleUpdate {
+  idProductoPadre: number;
+  idProductoHijo: number;
+  cantidad?: number;
 }
 
 // Cart Types (for frontend use)

@@ -1,7 +1,6 @@
 // Export all API services
 export { 
   productService, 
-  categoryService, 
   inventoryService 
 } from './api/products';
 export { orderService } from './api/orders';
