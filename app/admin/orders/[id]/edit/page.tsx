@@ -19,6 +19,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import Header from '@/components/layout/header';
 import { orderService } from '@/services/api/orders';
 import { clientService } from '@/services/api/clients';
 import { couponService } from '@/services/api/coupons';
@@ -315,36 +316,41 @@ export default function EditOrderPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={handleCancel}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Cancelar
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Editar Pedido #{orderId}</h1>
-            <p className="text-muted-foreground mt-1">
-              Modifica la información del pedido seleccionado
-            </p>
+    <div className="min-h-screen bg-gray-100">
+      {/* Admin Header */}
+      <Header />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" onClick={handleCancel}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Cancelar
+              </Button>
+              <div>
+                <h1 className="text-3xl font-bold">Editar Pedido #{orderId}</h1>
+                <p className="text-muted-foreground mt-1">
+                  Modifica la información del pedido seleccionado
+                </p>
+              </div>
+            </div>
+            <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
+              <Save className="h-4 w-4 mr-2" />
+              {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+            </Button>
           </div>
-        </div>
-        <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
-          <Save className="h-4 w-4 mr-2" />
-          {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
-        </Button>
-      </div>
 
-      {error && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="py-4">
-            <p className="text-red-600 text-sm">{error}</p>
-          </CardContent>
-        </Card>
-      )}
+          {error && (
+            <Card className="border-red-200 bg-red-50">
+              <CardContent className="py-4">
+                <p className="text-red-600 text-sm">{error}</p>
+              </CardContent>
+            </Card>
+          )}
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Form */}
           <div className="lg:col-span-2 space-y-6">
@@ -802,6 +808,8 @@ export default function EditOrderPage() {
           </div>
         </div>
       </form>
+        </div>
+      </div>
     </div>
   );
 }
