@@ -9,12 +9,12 @@ interface UseApiReturn<T> {
   data: T | null;
   loading: boolean;
   error: string | null;
-  execute: (...args: any[]) => Promise<T>;
+  execute: (...args: unknown[]) => Promise<T>;
   reset: () => void;
 }
 
 export function useApi<T>(
-  apiFunction: (...args: any[]) => Promise<T>,
+  apiFunction: (...args: unknown[]) => Promise<T>,
   options: UseApiOptions<T> = {}
 ): UseApiReturn<T> {
   const { initialData = null, executeOnMount = false } = options;
@@ -24,7 +24,7 @@ export function useApi<T>(
   const [error, setError] = useState<string | null>(null);
 
   const execute = useCallback(
-    async (...args: any[]): Promise<T> => {
+    async (...args: unknown[]): Promise<T> => {
       setLoading(true);
       setError(null);
 
@@ -32,8 +32,8 @@ export function useApi<T>(
         const result = await apiFunction(...args);
         setData(result);
         return result;
-      } catch (err: any) {
-        const errorMessage = err.message || 'An error occurred';
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'An error occurred';
         setError(errorMessage);
         throw err;
       } finally {
@@ -67,7 +67,7 @@ export function useApi<T>(
 // Specialized hooks for common patterns
 export function useApiData<T>(
   apiFunction: () => Promise<T>,
-  deps: any[] = []
+  deps: React.DependencyList = []
 ) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -85,9 +85,9 @@ export function useApiData<T>(
         if (!isCancelled) {
           setData(result);
         }
-      } catch (err: any) {
+      } catch (err) {
         if (!isCancelled) {
-          setError(err.message || 'An error occurred');
+          setError(err instanceof Error ? err.message : 'An error occurred');
         }
       } finally {
         if (!isCancelled) {
@@ -107,7 +107,7 @@ export function useApiData<T>(
 }
 
 // Hook for mutations (POST, PUT, DELETE operations)
-export function useMutation<T, P = any>(
+export function useMutation<T, P = Record<string, unknown>>(
   mutationFunction: (params: P) => Promise<T>
 ) {
   const [loading, setLoading] = useState(false);
@@ -120,8 +120,8 @@ export function useMutation<T, P = any>(
     try {
       const result = await mutationFunction(params);
       return result;
-    } catch (err: any) {
-      setError(err.message || 'An error occurred');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
       throw err;
     } finally {
       setLoading(false);
