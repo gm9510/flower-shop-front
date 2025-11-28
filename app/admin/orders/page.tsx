@@ -17,7 +17,7 @@ export default function OrdersPage() {
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  
+
   // Orders data state
   const [orders, setOrders] = useState<PedidosResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,7 +44,7 @@ export default function OrdersPage() {
       if (paymentStatusFilter && paymentStatusFilter !== 'all') {
         params.estado_pago = paymentStatusFilter;
       }
-      
+
       // Add date range filter
       if (startDate) {
         params.fecha_envio_desde = startDate;
@@ -56,7 +56,7 @@ export default function OrdersPage() {
       // Note: The API doesn't have a direct search parameter,
       // but we can filter by status. For full search, we might need
       // to implement client-side filtering or extend the API
-      
+
       const response = await orderService.getPedidos(params);
 
       // For now, we'll implement client-side search filtering
@@ -76,7 +76,7 @@ export default function OrdersPage() {
       // In a real implementation, the API should return pagination metadata
       setTotalPages(Math.ceil(filteredOrders.length / 10) || 1);
       setTotalResults(filteredOrders.length);
-      
+
     } catch (err) {
       console.error('Error fetching orders:', err);
       setError('Error al cargar los pedidos. Por favor, intenta de nuevo.');
