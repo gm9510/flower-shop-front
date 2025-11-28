@@ -27,6 +27,7 @@ const orderSchema = z.object({
   direccionEnvio: z.string().optional(),
   cuponId: z.number().optional(),
   metodoEnvioId: z.number().optional(),
+  fechaEnvio: z.string().optional(),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -255,6 +256,15 @@ export default function CreateOrderForm({ onSuccess, onCancel }: CreateOrderForm
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="fechaEnvio" className='pb-2'>Fecha de Envío</Label>
+            <Input
+              id="fechaEnvio"
+              type="date"
+              {...register('fechaEnvio')}
+            />
           </div>
 
           <div>

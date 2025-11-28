@@ -253,6 +253,16 @@ export default function ViewOrderDrawer({ orderId, isOpen, onClose }: ViewOrderD
                       })}
                     </p>
                   </div>
+                  {order.fechaEnvio && (
+                    <div>
+                      <span className="text-sm text-gray-600">Fecha de Envío:</span>
+                      <p className="font-medium">
+                        {new Date(order.fechaEnvio).toLocaleDateString('es-CO', {
+                          dateStyle: 'long',
+                        })}
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

@@ -20,27 +20,27 @@ export const productService = {
     precio_min?: number;
     precio_max?: number;
   }): Promise<Producto[]> {
-    return apiClient.get<Producto[]>('/productos', params);
+    return apiClient.get<Producto[]>('/api/productos/', params);
   },
 
   // Create new product
   async createProducto(productData: ProductoCreate): Promise<Producto> {
-    return apiClient.post<Producto>('/productos', productData);
+    return apiClient.post<Producto>('/api/productos/', productData);
   },
 
-  // Get single product by ID (assuming endpoint exists)
+  // Get single product by ID
   async getProducto(id: number): Promise<Producto> {
-    return apiClient.get<Producto>(`/productos/${id}`);
+    return apiClient.get<Producto>(`/api/productos/${id}`);
   },
 
-  // Update product (assuming endpoint exists)
+  // Update product
   async updateProducto(id: number, updates: Partial<ProductoCreate>): Promise<Producto> {
-    return apiClient.put<Producto>(`/productos/${id}`, updates);
+    return apiClient.put<Producto>(`/api/productos/${id}`, updates);
   },
 
-  // Delete product (assuming endpoint exists)
+  // Delete product
   async deleteProducto(id: number): Promise<void> {
-    return apiClient.delete<void>(`/productos/${id}`);
+    return apiClient.delete<void>(`/api/productos/${id}`);
   },
 };
 
@@ -82,7 +82,7 @@ export const inventoryService = {
     producto_id?: number;
     stock_minimo?: number;
   }): Promise<Inventario[]> {
-    return apiClient.get<Inventario[]>('/inventario', params);
+    return apiClient.get<Inventario[]>('/api/inventarios/', params);
   },
 
   // Create new inventory entry
@@ -91,66 +91,20 @@ export const inventoryService = {
     cantidadStock: number;
     cantidadMinima: number;
   }): Promise<Inventario> {
-    return apiClient.post<Inventario>('/inventario', inventoryData);
+    return apiClient.post<Inventario>('/api/inventarios/', inventoryData);
   },
 
-  // Update inventory (assuming endpoint exists)
+  // Update inventory
   async updateInventario(id: number, updates: {
     cantidadStock?: number;
     cantidadMinima?: number;
   }): Promise<Inventario> {
-    return apiClient.put<Inventario>(`/inventario/${id}`, updates);
+    return apiClient.put<Inventario>(`/api/inventarios/${id}`, updates);
   },
 };
 
-export const couponService = {
-  // Get all coupons
-  async getCupones(params?: {
-    skip?: number;
-    limit?: number;
-    activo?: boolean;
-    codigo?: string;
-  }): Promise<Cupon[]> {
-    return apiClient.get<Cupon[]>('/cupones', params);
-  },
-
-  // Create new coupon
-  async createCupon(couponData: {
-    codigo: string;
-    tipoDescuento: string;
-    valorDescuento: number;
-    fechaInicio: string;
-    fechaVencimiento: string;
-    activo?: boolean;
-  }): Promise<Cupon> {
-    return apiClient.post<Cupon>('/cupones', couponData);
-  },
-
-  // Validate coupon (assuming endpoint exists)
-  async validateCupon(codigo: string): Promise<Cupon> {
-    return apiClient.get<Cupon>(`/cupones/validate/${codigo}`);
-  },
-};
-
-export const shippingService = {
-  // Get shipping methods
-  async getMetodosEnvio(params?: {
-    skip?: number;
-    limit?: number;
-  }): Promise<MetodoEnvio[]> {
-    return apiClient.get<MetodoEnvio[]>('/metodos-envio', params);
-  },
-
-  // Create new shipping method
-  async createMetodoEnvio(shippingData: {
-    nombre: string;
-    descripcion?: string;
-    costo: number;
-    tiempoEstimado?: string;
-  }): Promise<MetodoEnvio> {
-    return apiClient.post<MetodoEnvio>('/metodos-envio', shippingData);
-  },
-};
+// Note: couponService and shippingService are in their respective files
+// Import them from there if needed
 
 // Keep cart service for frontend state management
 export const cartService = {

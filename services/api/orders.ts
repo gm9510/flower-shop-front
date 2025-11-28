@@ -15,51 +15,33 @@ export const orderService = {
     cliente_id?: number;
     estado_pedido?: string;
     estado_pago?: string;
+    fecha_envio_desde?: string; // ISO date string
+    fecha_envio_hasta?: string; // ISO date string
   }): Promise<PedidosResponse[]> {
-    return apiClient.get<PedidosResponse[]>('/pedidos', params);
+    return apiClient.get<PedidosResponse[]>('/api/pedidos/', params);
   },
 
   // Create a new order
   async createPedido(orderData: PedidosCreate): Promise<PedidosResponse> {
-    return apiClient.post<PedidosResponse>('/pedidos', orderData);
+    return apiClient.post<PedidosResponse>('/api/pedidos/', orderData);
   },
 
   // Get single order by ID with detailed information
   async getPedido(pedidoId: number): Promise<PedidosDetail> {
-    return apiClient.get<PedidosDetail>(`/pedidos/${pedidoId}`);
+    return apiClient.get<PedidosDetail>(`/api/pedidos/${pedidoId}`);
   },
 
   // Update an existing order
   async updatePedido(pedidoId: number, updates: PedidosUpdate): Promise<PedidosResponse> {
-    return apiClient.put<PedidosResponse>(`/pedidos/${pedidoId}`, updates);
+    return apiClient.put<PedidosResponse>(`/api/pedidos/${pedidoId}`, updates);
   },
 
   // Delete an order
   async deletePedido(pedidoId: number): Promise<void> {
-    return apiClient.delete<void>(`/pedidos/${pedidoId}`);
+    return apiClient.delete<void>(`/api/pedidos/${pedidoId}`);
   },
 
-  // Update order status only (specialized endpoint)
-  async updatePedidoEstado(
-    pedidoId: number, 
-    params?: {
-      estado_pedido?: string;
-      estado_pago?: string;
-    }
-  ): Promise<PedidosResponse> {
-    const queryParams = new URLSearchParams();
-    if (params?.estado_pedido) {
-      queryParams.append('estado_pedido', params.estado_pedido);
-    }
-    if (params?.estado_pago) {
-      queryParams.append('estado_pago', params.estado_pago);
-    }
-    
-    const url = `/pedidos/${pedidoId}/estado${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return apiClient.patch<PedidosResponse>(url);
-  },
-
-  // Get orders by customer ID
+  // Get orders by customer ID (using filter)
   async getPedidosByCliente(
     clienteId: number,
     params?: {
@@ -69,12 +51,7 @@ export const orderService = {
       estado_pago?: string;
     }
   ): Promise<PedidosResponse[]> {
-    return apiClient.get<PedidosResponse[]>(`/pedidos/cliente/${clienteId}`, params);
-  },
-
-  // Get order statistics
-  async getPedidosStats(): Promise<PedidosStats> {
-    return apiClient.get<PedidosStats>('/pedidos/stats/resumen');
+    return this.getPedidos({ ...params, cliente_id: clienteId });
   },
 
   // Helper methods for common operations
@@ -101,31 +78,37 @@ export const orderService = {
 
   // Update order to processing status
   async markAsProcessing(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pedido: 'procesando' });
+    const pedido = await this.getPedido(pedidoId);
+    return this.updatePedido(pedidoId, { ...pedido, estadoPedido: 'procesando' });
   },
 
   // Update order to shipped status
   async markAsShipped(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pedido: 'enviado' });
+    const pedido = await this.getPedido(pedidoId);
+    return this.updatePedido(pedidoId, { ...pedido, estadoPedido: 'enviado' });
   },
 
   // Update order to delivered status
   async markAsDelivered(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pedido: 'entregado' });
+    const pedido = await this.getPedido(pedidoId);
+    return this.updatePedido(pedidoId, { ...pedido, estadoPedido: 'entregado' });
   },
 
   // Cancel order
   async cancelPedido(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pedido: 'cancelado' });
+    const pedido = await this.getPedido(pedidoId);
+    return this.updatePedido(pedidoId, { ...pedido, estadoPedido: 'cancelado' });
   },
 
   // Mark payment as paid
   async markPaymentAsPaid(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pago: 'pagado' });
+    const pedido = await this.getPedido(pedidoId);
+    return this.updatePedido(pedidoId, { ...pedido, estadoPago: 'pagado' });
   },
 
   // Mark payment as failed
   async markPaymentAsFailed(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pago: 'fallido' });
+    const pedido = await this.getPedido(pedidoId);
+    return this.updatePedido(pedidoId, { ...pedido, estadoPago: 'fallido' });
   },
 };

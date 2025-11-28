@@ -15,8 +15,10 @@ import { useRouter } from 'next/navigation';
 export default function OrdersPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [paymentMethodFilter, setPaymentMethodFilter] = useState('');
+  const [deliveryStatusFilter, setDeliveryStatusFilter] = useState('');
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   
   // Orders data state
   const [orders, setOrders] = useState<PedidosResponse[]>([]);
@@ -43,9 +45,20 @@ export default function OrdersPage() {
         limit: 10,
       };
 
-      // Add filters if they exist
-      if (statusFilter) {
-        params.estado_pedido = statusFilter;
+      // Add filters if they exist (excluding "all" which means no filter)
+      if (deliveryStatusFilter && deliveryStatusFilter !== 'all') {
+        params.estado_pedido = deliveryStatusFilter;
+      }
+      if (paymentStatusFilter && paymentStatusFilter !== 'all') {
+        params.estado_pago = paymentStatusFilter;
+      }
+      
+      // Add date range filter
+      if (startDate) {
+        params.fecha_envio_desde = startDate;
+      }
+      if (endDate) {
+        params.fecha_envio_hasta = endDate;
       }
 
       // Note: The API doesn't have a direct search parameter,
@@ -84,7 +97,7 @@ export default function OrdersPage() {
   // Effect to fetch orders when filters change
   useEffect(() => {
     fetchOrders(1); // Reset to first page when filters change
-  }, [searchQuery, statusFilter, paymentMethodFilter]);
+  }, [searchQuery, deliveryStatusFilter, paymentStatusFilter, startDate, endDate]);
 
   // Handle page change
   const handlePageChange = (page: number) => {
@@ -120,6 +133,12 @@ export default function OrdersPage() {
     // Refresh orders list after successful edit
     fetchOrders(currentPage);
   };
+
+  const handleDateRangeChange = (start: string, end: string) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Admin Header */}
@@ -140,8 +159,9 @@ export default function OrdersPage() {
           <CardContent className="pt-6">
             <SearchAndFilter
               onSearchChange={setSearchQuery}
-              onStatusFilterChange={setStatusFilter}
-              onPaymentMethodFilterChange={setPaymentMethodFilter}
+              onStatusFilterChange={setDeliveryStatusFilter}
+              onPaymentMethodFilterChange={setPaymentStatusFilter}
+              onDateRangeChange={handleDateRangeChange}
             />
           </CardContent>
         </Card>

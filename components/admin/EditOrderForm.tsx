@@ -26,6 +26,7 @@ const orderSchema = z.object({
   direccionEnvio: z.string().optional(),
   cuponId: z.number().optional().nullable(),
   metodoEnvioId: z.number().optional().nullable(),
+  fechaEnvio: z.string().optional(),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -69,6 +70,7 @@ export default function EditOrderForm({ orderId, onSuccess, onCancel }: EditOrde
         setValue('direccionEnvio', orderData.direccionEnvio || '');
         setValue('cuponId', orderData.cuponId || null);
         setValue('metodoEnvioId', orderData.metodoEnvioId || null);
+        setValue('fechaEnvio', orderData.fechaEnvio ? orderData.fechaEnvio.split('T')[0] : '');
 
         // Load dropdown data
         const [clientsData, couponsData, shippingData] = await Promise.all([
@@ -102,6 +104,7 @@ export default function EditOrderForm({ orderId, onSuccess, onCancel }: EditOrde
       if (data.direccionEnvio !== undefined) updateData.direccionEnvio = data.direccionEnvio;
       if (data.cuponId !== undefined && data.cuponId !== null) updateData.cuponId = data.cuponId;
       if (data.metodoEnvioId !== undefined && data.metodoEnvioId !== null) updateData.metodoEnvioId = data.metodoEnvioId;
+      if (data.fechaEnvio !== undefined) updateData.fechaEnvio = data.fechaEnvio;
 
       await orderService.updatePedido(orderId, updateData);
       onSuccess?.();
@@ -270,6 +273,16 @@ export default function EditOrderForm({ orderId, onSuccess, onCancel }: EditOrde
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="fechaEnvio" className='pb-2'>Fecha de Envío</Label>
+            <Input
+              id="fechaEnvio"
+              type="date"
+              defaultValue={order.fechaEnvio ? order.fechaEnvio.split('T')[0] : ''}
+              {...register('fechaEnvio')}
+            />
           </div>
 
           <div>

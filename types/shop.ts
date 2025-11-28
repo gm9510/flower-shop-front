@@ -39,6 +39,7 @@ export interface PedidosResponse {
   direccionEnvio?: string;
   cuponId?: number;
   metodoEnvioId?: number;
+  fechaEnvio: string; // ISO date string
   creadoEn: string; // ISO date string
 }
 
@@ -58,6 +59,7 @@ export interface PedidosCreate {
   direccionEnvio?: string;
   cuponId?: number;
   metodoEnvioId?: number;
+  fechaEnvio?: string; // ISO date string
 }
 
 export interface PedidosUpdate {
@@ -68,6 +70,7 @@ export interface PedidosUpdate {
   direccionEnvio?: string;
   cuponId?: number;
   metodoEnvioId?: number;
+  fechaEnvio?: string; // ISO date string
 }
 
 // Order Status Enums

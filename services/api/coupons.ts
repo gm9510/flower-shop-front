@@ -9,7 +9,7 @@ export const couponService = {
     activo?: boolean;
     codigo?: string;
   }): Promise<Cupon[]> {
-    return apiClient.get<Cupon[]>('/cupones', params);
+    return apiClient.get<Cupon[]>('/api/pedidocupones/', params);
   },
 
   // Get active coupons only
@@ -19,22 +19,22 @@ export const couponService = {
 
   // Create new coupon
   async createCupon(couponData: Omit<Cupon, 'id' | 'creadoEn'>): Promise<Cupon> {
-    return apiClient.post<Cupon>('/cupones', couponData);
+    return apiClient.post<Cupon>('/api/pedidocupones/', couponData);
   },
 
   // Get single coupon by ID
   async getCupon(id: number): Promise<Cupon> {
-    return apiClient.get<Cupon>(`/cupones/${id}`);
+    return apiClient.get<Cupon>(`/api/pedidocupones/${id}`);
   },
 
   // Update coupon
   async updateCupon(id: number, updates: Partial<Cupon>): Promise<Cupon> {
-    return apiClient.put<Cupon>(`/cupones/${id}`, updates);
+    return apiClient.put<Cupon>(`/api/pedidocupones/${id}`, updates);
   },
 
   // Delete coupon
   async deleteCupon(id: number): Promise<void> {
-    return apiClient.delete<void>(`/cupones/${id}`);
+    return apiClient.delete<void>(`/api/pedidocupones/${id}`);
   },
 
   // Validate coupon code
