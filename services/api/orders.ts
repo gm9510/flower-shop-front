@@ -1,80 +1,57 @@
 import { apiClient } from '@/lib/api';
 import type { 
   PedidosResponse, 
-  PedidosDetail, 
   PedidosCreate, 
   PedidosUpdate,
-  PedidosStats
+  PedidosDetail,
 } from '@/types/shop';
+import { EstadoPedido, EstadoPago } from '@/types/shop';
 
 export const orderService = {
   // Get all orders with optional filtering and pagination
   async getPedidos(params?: {
     skip?: number;
     limit?: number;
-    cliente_id?: number;
-    estado_pedido?: string;
-    estado_pago?: string;
+    idEntidad?: number;
+    estadoPedido?: string;
+    estadoPago?: string;
+    fechaEntregaDesde?: string; // ISO date string
+    fechaEntregaHasta?: string; // ISO date string
   }): Promise<PedidosResponse[]> {
-    return apiClient.get<PedidosResponse[]>('/pedidos', params);
+    return apiClient.get<PedidosResponse[]>('/api/pedidos/', params);
   },
 
   // Create a new order
   async createPedido(orderData: PedidosCreate): Promise<PedidosResponse> {
-    return apiClient.post<PedidosResponse>('/pedidos', orderData);
+    return apiClient.post<PedidosResponse>('/api/pedidos/', orderData);
   },
 
   // Get single order by ID with detailed information
   async getPedido(pedidoId: number): Promise<PedidosDetail> {
-    return apiClient.get<PedidosDetail>(`/pedidos/${pedidoId}`);
+    return apiClient.get<PedidosDetail>(`/api/pedidos/${pedidoId}`);
   },
 
   // Update an existing order
   async updatePedido(pedidoId: number, updates: PedidosUpdate): Promise<PedidosResponse> {
-    return apiClient.put<PedidosResponse>(`/pedidos/${pedidoId}`, updates);
+    return apiClient.put<PedidosResponse>(`/api/pedidos/${pedidoId}`, updates);
   },
 
   // Delete an order
   async deletePedido(pedidoId: number): Promise<void> {
-    return apiClient.delete<void>(`/pedidos/${pedidoId}`);
+    return apiClient.delete<void>(`/api/pedidos/${pedidoId}`);
   },
 
-  // Update order status only (specialized endpoint)
-  async updatePedidoEstado(
-    pedidoId: number, 
-    params?: {
-      estado_pedido?: string;
-      estado_pago?: string;
-    }
-  ): Promise<PedidosResponse> {
-    const queryParams = new URLSearchParams();
-    if (params?.estado_pedido) {
-      queryParams.append('estado_pedido', params.estado_pedido);
-    }
-    if (params?.estado_pago) {
-      queryParams.append('estado_pago', params.estado_pago);
-    }
-    
-    const url = `/pedidos/${pedidoId}/estado${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return apiClient.patch<PedidosResponse>(url);
-  },
-
-  // Get orders by customer ID
-  async getPedidosByCliente(
-    clienteId: number,
+  // Get orders by entity ID (using filter)
+  async getPedidosByEntidad(
+    entidadId: number,
     params?: {
       skip?: number;
       limit?: number;
-      estado_pedido?: string;
-      estado_pago?: string;
+      estadoPedido?: string;
+      estadoPago?: string;
     }
   ): Promise<PedidosResponse[]> {
-    return apiClient.get<PedidosResponse[]>(`/pedidos/cliente/${clienteId}`, params);
-  },
-
-  // Get order statistics
-  async getPedidosStats(): Promise<PedidosStats> {
-    return apiClient.get<PedidosStats>('/pedidos/stats/resumen');
+    return this.getPedidos({ ...params, idEntidad: entidadId });
   },
 
   // Helper methods for common operations
@@ -85,47 +62,47 @@ export const orderService = {
   },
 
   // Get orders by status
-  async getPedidosByStatus(status: string): Promise<PedidosResponse[]> {
-    return this.getPedidos({ estado_pedido: status });
+  async getPedidosByStatus(status: EstadoPedido): Promise<PedidosResponse[]> {
+    return this.getPedidos({ estadoPedido: status });
   },
 
   // Get paid orders
   async getPaidPedidos(): Promise<PedidosResponse[]> {
-    return this.getPedidos({ estado_pago: 'pagado' });
+    return this.getPedidos({ estadoPago: EstadoPago.PAGADO });
   },
 
   // Get pending orders
   async getPendingPedidos(): Promise<PedidosResponse[]> {
-    return this.getPedidos({ estado_pedido: 'pendiente' });
+    return this.getPedidos({ estadoPedido: EstadoPedido.PENDIENTE });
   },
 
   // Update order to processing status
   async markAsProcessing(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pedido: 'procesando' });
+    return this.updatePedido(pedidoId, { estadoPedido: EstadoPedido.PROCESANDO });
   },
 
   // Update order to shipped status
   async markAsShipped(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pedido: 'enviado' });
+    return this.updatePedido(pedidoId, { estadoPedido: EstadoPedido.ENVIADO });
   },
 
   // Update order to delivered status
   async markAsDelivered(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pedido: 'entregado' });
+    return this.updatePedido(pedidoId, { estadoPedido: EstadoPedido.ENTREGADO });
   },
 
   // Cancel order
   async cancelPedido(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pedido: 'cancelado' });
+    return this.updatePedido(pedidoId, { estadoPedido: EstadoPedido.CANCELADO });
   },
 
   // Mark payment as paid
   async markPaymentAsPaid(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pago: 'pagado' });
+    return this.updatePedido(pedidoId, { estadoPago: EstadoPago.PAGADO });
   },
 
   // Mark payment as failed
   async markPaymentAsFailed(pedidoId: number): Promise<PedidosResponse> {
-    return this.updatePedidoEstado(pedidoId, { estado_pago: 'fallido' });
+    return this.updatePedido(pedidoId, { estadoPago: EstadoPago.FALLIDO });
   },
 };
