@@ -7,8 +7,6 @@ import type { OrderFormData } from '../schema/orderSchema';
 export const useOrderItems = (
     orderId: number,
     products: Producto[],
-    setValue: UseFormSetValue<OrderFormData>,
-    watch: UseFormWatch<OrderFormData>
 ) => {
     const [orderItems, setOrderItems] = useState<PedidoDetalle[]>([]);
     const [deletedItemIds, setDeletedItemIds] = useState<number[]>([]);

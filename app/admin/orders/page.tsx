@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Header from '@/components/layout/header';
 import { Card, CardContent } from '@/components/ui/card';
 import SearchAndFilter from '@/components/admin/orders/SearchAndFilter';
 import PageHeader from '@/components/admin/orders/PageHeader';
 import OrdersTable from '@/components/admin/orders/Table';
-import { orderService } from '@/services/api/orders';
-import type { PedidosResponse } from '@/types/shop';
+import { usePaginatedOrders } from './hooks/usePaginatedOrders';
 import { useRouter } from 'next/navigation';
 
 export default function OrdersPage() {
@@ -18,82 +17,41 @@ export default function OrdersPage() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  // Orders data state
-  const [orders, setOrders] = useState<PedidosResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalResults, setTotalResults] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  // Use paginated orders hook
+  const {
+    orders,
+    total,
+    currentPage,
+    totalPages,
+    isLoading,
+    error,
+    goToPage,
+  } = usePaginatedOrders({
+    page: 1,
+    pageSize: 10,
+    estadoPedido: deliveryStatusFilter,
+    estadoPago: paymentStatusFilter,
+    fechaEntregaDesde: startDate,
+    fechaEntregaHasta: endDate,
+  });
 
-  // Fetch orders function
-  const fetchOrders = async (page = 1) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const params: any = {
-        skip: (page - 1) * 10,
-        limit: 10,
-      };
-
-      // Add filters if they exist (excluding "all" which means no filter)
-      if (deliveryStatusFilter && deliveryStatusFilter !== 'all') {
-        params.estado_pedido = deliveryStatusFilter;
-      }
-      if (paymentStatusFilter && paymentStatusFilter !== 'all') {
-        params.estado_pago = paymentStatusFilter;
-      }
-
-      // Add date range filter
-      if (startDate) {
-        params.fecha_envio_desde = startDate;
-      }
-      if (endDate) {
-        params.fecha_envio_hasta = endDate;
-      }
-
-      // Note: The API doesn't have a direct search parameter,
-      // but we can filter by status. For full search, we might need
-      // to implement client-side filtering or extend the API
-
-      const response = await orderService.getPedidos(params);
-
-      // For now, we'll implement client-side search filtering
-      let filteredOrders = response;
-      if (searchQuery.trim()) {
+  // Client-side search filtering
+  const filteredOrders = searchQuery.trim()
+    ? orders.filter(order => {
         const query = searchQuery.toLowerCase();
-        filteredOrders = response.filter(order =>
+        return (
           order.id.toString().includes(query) ||
+          order.numeroFactura?.toString().includes(query) ||
           order.idEntidad.toString().includes(query) ||
-          order.metodoPago?.toLowerCase().includes(query)
+          order.metodoPago?.toLowerCase().includes(query) ||
+          order.usuario?.toLowerCase().includes(query)
         );
-      }
-
-      setOrders(filteredOrders);
-      setCurrentPage(page);
-      // For now, we'll assume 10 items per page and calculate total pages
-      // In a real implementation, the API should return pagination metadata
-      setTotalPages(Math.ceil(filteredOrders.length / 10) || 1);
-      setTotalResults(filteredOrders.length);
-
-    } catch (err) {
-      console.error('Error fetching orders:', err);
-      setError('Error al cargar los pedidos. Por favor, intenta de nuevo.');
-      setOrders([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Effect to fetch orders when filters change
-  useEffect(() => {
-    fetchOrders(1); // Reset to first page when filters change
-  }, [searchQuery, deliveryStatusFilter, paymentStatusFilter, startDate, endDate]);
+      })
+    : orders;
 
   // Handle page change
   const handlePageChange = (page: number) => {
-    fetchOrders(page);
+    goToPage(page);
   };
 
   const handleFilterClick = () => {
@@ -154,11 +112,11 @@ export default function OrdersPage() {
 
         {/* Orders Table */}
         <OrdersTable
-          orders={orders}
+          orders={filteredOrders}
           isLoading={isLoading}
           currentPage={currentPage}
           totalPages={totalPages}
-          totalResults={totalResults}
+          totalResults={total}
           onViewOrder={handleViewOrder}
           onEditOrder={handleEditOrder}
           onPageChange={handlePageChange}

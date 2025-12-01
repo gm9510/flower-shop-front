@@ -64,7 +64,7 @@ export default function EditOrderPage() {
         handleRemoveItem,
         handleUpdateItemQuantity,
         getProductName,
-    } = useOrderItems(orderId, products, setValue, watch);
+    } = useOrderItems(orderId, products);
 
     // update the discount field when coupon or subtotal changes
     useCalculateMontoTotal({

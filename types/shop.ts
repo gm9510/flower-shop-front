@@ -125,27 +125,51 @@ export interface PedidosUpdate {
   usuario?: string;
 }
 
+// Paginated Pedidos Response
+export interface PaginatedPedidosResponse {
+  items: PedidosResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
 
-// Client Types (based on backend ClienteResponse)
-export interface Cliente {
+
+// Entity Types (based on backend EntityResponse)
+export interface Entity {
   id: number;
+  nit: string;
+  dv: number;
   nombre: string;
-  apellido: string;
-  email: string;
   telefono?: string;
+  correo: string;
+  estado: boolean;
   direccion?: string;
-  fechaNacimiento?: string;
-  creadoEn: string;
 }
 
-export interface ClienteCreate {
+export interface EntityCreate {
+  nit: string;
+  dv: number;
   nombre: string;
-  apellido: string;
-  email: string;
   telefono?: string;
+  correo: string;
+  estado?: boolean;
   direccion?: string;
-  fechaNacimiento?: string;
 }
+
+export interface EntityUpdate {
+  nit?: string;
+  dv?: number;
+  nombre?: string;
+  telefono?: string;
+  correo?: string;
+  estado?: boolean;
+  direccion?: string;
+}
+
+// Legacy alias for backwards compatibility
+export type Cliente = Entity;
+export type ClienteCreate = EntityCreate;
 
 // Inventory Types
 export interface Inventario {

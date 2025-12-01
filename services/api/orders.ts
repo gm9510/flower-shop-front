@@ -3,11 +3,25 @@ import type {
   PedidosResponse, 
   PedidosCreate, 
   PedidosUpdate,
+  PaginatedPedidosResponse,
 } from '@/types/shop';
 import { EstadoPedido, EstadoPago } from '@/types/shop';
 
 export const orderService = {
-  // Get all orders with optional filtering and pagination
+  // Get paginated orders with optional filtering
+  async getPedidosPaginated(params?: {
+    page?: number;
+    page_size?: number;
+    idEntidad?: number;
+    estadoPedido?: string;
+    estadoPago?: string;
+    fechaEntregaDesde?: string; // ISO date string
+    fechaEntregaHasta?: string; // ISO date string
+  }): Promise<PaginatedPedidosResponse> {
+    return apiClient.get<PaginatedPedidosResponse>('/api/pedidos/', params);
+  },
+
+  // Get all orders with optional filtering and pagination (legacy skip/limit)
   async getPedidos(params?: {
     skip?: number;
     limit?: number;
