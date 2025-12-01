@@ -14,7 +14,6 @@ export interface PedidoDetalleCreate {
   idProducto: number;
   cantidad: number;
   precioUnitario: number;
-  subtotal: number;
 }
 
 export interface PedidoDetalleUpdate {

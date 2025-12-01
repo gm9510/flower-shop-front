@@ -122,12 +122,6 @@ export interface PedidosUpdate {
   usuario?: string;
 }
 
-export interface PedidosDetail extends PedidosResponse {
-  entidad_nombre?: string;
-  entidad_email?: string;
-  cupon_codigo?: string;
-  envio_nombre?: string;
-}
 
 // Client Types (based on backend ClienteResponse)
 export interface Cliente {
