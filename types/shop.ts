@@ -1,3 +1,6 @@
+// Shop View Types
+export type ViewType = "home" | "products" | "detail" | "cart" | "about"
+
 // Product Types (based on backend ProductoResponse)
 export interface Producto {
   id: number;
