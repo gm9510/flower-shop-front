@@ -88,10 +88,9 @@ export const ShippingSection = ({
                         <SelectContent>
                             <SelectItem value="0">Sin cupón</SelectItem>
                             {coupons
-                                .filter((coupon) => coupon.activo)
                                 .map((coupon) => (
                                     <SelectItem key={coupon.id} value={coupon.id.toString()}>
-                                        {coupon.codigo} -{' '}
+                                        {coupon.codigo} -   {' '}
                                         {coupon.tipoDescuento === 'porcentaje'
                                             ? `${coupon.valorDescuento}%`
                                             : `$${coupon.valorDescuento.toLocaleString()} COP`}

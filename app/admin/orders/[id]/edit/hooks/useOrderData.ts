@@ -59,7 +59,7 @@ export const useOrderData = (orderId: number, setValue: UseFormSetValue<OrderFor
             // Load dropdown data
             const [clientsData, couponsData, shippingData, productsData] = await Promise.all([
                 clientService.getClientes({ limit: 100 }),
-                couponService.getCupones(),
+                couponService.getActiveCupones(),
                 shippingService.getMetodosEnvio(),
                 productService.getProductos({ limit: 500 }),
             ]);
