@@ -134,9 +134,9 @@ export default function OrdersTable({
                 orders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">#{order.id}</TableCell>
-                    <TableCell>Cliente {order.clienteId}</TableCell>
+                    <TableCell>Cliente {order.idEntidad}</TableCell>
                     <TableCell>
-                      {new Date(order.creadoEn).toLocaleDateString('es-CO')}
+                      {order.registro}
                     </TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(order.estadoPedido)}>

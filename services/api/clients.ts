@@ -39,9 +39,4 @@ export const clientService = {
   },
 
   // Get client orders (using order service)
-  async getClientOrders(clienteId: number) {
-    // This would use the orderService.getPedidosByCliente method
-    const { orderService } = await import('./orders');
-    return orderService.getPedidosByCliente(clienteId);
-  },
 };

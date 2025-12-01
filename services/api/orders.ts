@@ -3,7 +3,6 @@ import type {
   PedidosResponse, 
   PedidosCreate, 
   PedidosUpdate,
-  PedidosDetail,
 } from '@/types/shop';
 import { EstadoPedido, EstadoPago } from '@/types/shop';
 
@@ -27,8 +26,8 @@ export const orderService = {
   },
 
   // Get single order by ID with detailed information
-  async getPedido(pedidoId: number): Promise<PedidosDetail> {
-    return apiClient.get<PedidosDetail>(`/api/pedidos/${pedidoId}`);
+  async getPedido(pedidoId: number): Promise<PedidosResponse> {
+    return apiClient.get<PedidosResponse>(`/api/pedidos/${pedidoId}`);
   },
 
   // Update an existing order
