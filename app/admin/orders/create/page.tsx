@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { use, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,6 +22,8 @@ import { OrderSummary } from './components/OrderSummary';
 import { OrderItemsSection } from './components/OrderItemsSection';
 import { formatPrice } from '../[id]/utils/formatters';
 import { orderItemService } from '@/services/api/order-items';
+import { useCalculateMontoTotal } from '@/app/admin/orders/create/hooks/useCalculateMontoTotal';
+import { useCashPayment } from './hooks/useCashPayment';
 
 export default function CreateOrderPage() {
     const router = useRouter();
@@ -53,6 +55,7 @@ export default function CreateOrderPage() {
         },
     });
 
+    // update the discount field when coupon or subtotal changes
 
     const { 
         orderItems,
@@ -65,6 +68,16 @@ export default function CreateOrderPage() {
         handleRemoveItem,
         handleUpdateItemQuantity,
     } = useOrderItems(products, setValue, watch);
+
+    useCalculateMontoTotal({
+      watch,
+      setValue,
+      cupons: coupons,
+      orderItems: orderItems,
+      shippingMethods: shippingMethods,
+    });
+
+    useCashPayment(watch, setValue);
 
     const selectedEntidadId = watch('idEntidad');
     const selectedCouponId = watch('idCupon');

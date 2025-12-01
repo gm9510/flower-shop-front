@@ -19,16 +19,6 @@ export const useOrderItems = (
     });
 
     // Recalculate subtotal and total when order items change
-    useEffect(() => {
-        const subtotal = orderItems.reduce(
-            (sum, item) => sum + item.precioUnitario * item.cantidad,
-            0
-        );
-        setValue('subTotal', subtotal);
-        const descuento = watch('descuento') || 0;
-        setValue('montoTotal', subtotal - descuento);
-    }, [orderItems, setValue, watch]);
-
     const handleAddItem = async (setError: (error: string | null) => void) => {
         if (!newItem.productoId || newItem.cantidad <= 0) {
             setError('Por favor selecciona un producto y una cantidad válida');

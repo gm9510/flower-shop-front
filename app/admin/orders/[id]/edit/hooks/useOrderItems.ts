@@ -26,17 +26,6 @@ export const useOrderItems = (
         }
     }, [orderId]);
 
-    // Recalculate subtotal and total when order items change
-    useEffect(() => {
-        const subtotal = orderItems.reduce(
-            (sum, item) => sum + item.precioUnitario * item.cantidad,
-            0
-        );
-        setValue('subTotal', subtotal);
-        const descuento = watch('descuento') || 0;
-        setValue('montoTotal', subtotal - descuento);
-    }, [orderItems, setValue, watch]);
-
     const loadOrderItems = async () => {
         try {
             const itemsData = await orderItemService.getItemsByPedido(orderId);

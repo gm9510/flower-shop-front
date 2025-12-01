@@ -4,7 +4,6 @@ import { orderService } from '@/services/api/orders';
 import { clientService } from '@/services/api/clients';
 import { couponService } from '@/services/api/coupons';
 import { shippingService } from '@/services/api/shipping';
-import { orderItemService } from '@/services/api/order-items';
 import { productService } from '@/services/api/products';
 import type {
     PedidosResponse,

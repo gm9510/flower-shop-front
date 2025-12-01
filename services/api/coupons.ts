@@ -6,25 +6,15 @@ export const couponService = {
   async getCupones(params?: {
     skip?: number;
     limit?: number;
-    codigo?: string;
+    code?: string;
+    active?: boolean;
   }): Promise<Cupon[]> {
     return apiClient.get<Cupon[]>('/api/pedidocupones/', params);
   },
 
-  // Get active coupons only (validates date range)
+  // Get active coupons only
   async getActiveCupones(): Promise<Cupon[]> {
-    const allCoupons = await this.getCupones();
-    const now = new Date().toISOString();
-    return allCoupons.filter(
-      (cupon) => {
-        // Check date validity if dates are provided
-        const dateValid = !cupon.validoDesde || !cupon.validoHasta || 
-          (cupon.validoDesde <= now && cupon.validoHasta >= now);
-        // Check usage limit if provided
-        const usageValid = cupon.limiteUso === undefined || cupon.limiteUso > 0;
-        return dateValid && usageValid;
-      }
-    );
+    return this.getCupones({ active: true });
   },
 
   // Create new coupon
@@ -49,23 +39,7 @@ export const couponService = {
 
   // Validate coupon code (checks if code exists and is currently valid)
   async validateCupon(codigo: string): Promise<Cupon | null> {
-    const coupons = await this.getCupones({ codigo });
-    if (coupons.length === 0) return null;
-
-    const cupon = coupons[0];
-    const now = new Date().toISOString();
-
-    // Check if coupon is within valid date range (if dates are provided)
-    const dateValid = !cupon.validoDesde || !cupon.validoHasta ||
-      (cupon.validoDesde <= now && cupon.validoHasta >= now);
-    
-    // Check if coupon has uses remaining (if limit is provided)
-    const usageValid = cupon.limiteUso === undefined || cupon.limiteUso > 0;
-
-    if (dateValid && usageValid) {
-      return cupon;
-    }
-
-    return null;
+    const coupons = await this.getCupones({ code: codigo, active: true });
+    return coupons.length > 0 ? coupons[0] : null;
   },
 };

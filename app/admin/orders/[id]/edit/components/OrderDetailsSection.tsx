@@ -69,7 +69,7 @@ export const OrderDetailsSection = ({
                             min="0"
                             placeholder="0.00"
                             {...register('subTotal', { valueAsNumber: true })}
-                            disabled={isSubmitting}
+                            disabled={true}
                         />
                         {errors.subTotal && (
                             <p className="text-sm text-red-600 mt-1">{errors.subTotal.message}</p>
@@ -84,7 +84,7 @@ export const OrderDetailsSection = ({
                             min="0"
                             placeholder="0.00"
                             {...register('descuento', { valueAsNumber: true })}
-                            disabled={isSubmitting}
+                            disabled={true}
                         />
                     </div>
                     <div>
@@ -96,7 +96,7 @@ export const OrderDetailsSection = ({
                             min="0"
                             placeholder="0.00"
                             {...register('saldo', { valueAsNumber: true })}
-                            disabled={isSubmitting}
+                            disabled={true}
                         />
                     </div>
                 </div>
@@ -110,7 +110,7 @@ export const OrderDetailsSection = ({
                         min="0"
                         placeholder="0.00"
                         {...register('montoTotal', { valueAsNumber: true })}
-                        disabled={isSubmitting}
+                        disabled={true}
                     />
                     {errors.montoTotal && (
                         <p className="text-sm text-red-600 mt-1">{errors.montoTotal.message}</p>
@@ -139,7 +139,7 @@ export const OrderDetailsSection = ({
                             min="0"
                             placeholder="0.00"
                             {...register('transferencia', { valueAsNumber: true })}
-                            disabled={isSubmitting}
+                            disabled={true}
                         />
                     </div>
                 </div>

@@ -18,10 +18,10 @@ export const useCreateOrderData = () => {
             try {
                 setIsLoading(true);
                 setError(null);
-                
+
                 const [clientsData, couponsData, shippingData, productsData] = await Promise.all([
                     clientService.getClientes(),
-                    couponService.getCupones(),
+                    couponService.getActiveCupones(),
                     shippingService.getMetodosEnvio(),
                     productService.getProductos(), // Assuming productService is imported
                 ]);

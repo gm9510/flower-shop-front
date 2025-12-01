@@ -20,6 +20,8 @@ import { OrderDetailsSection } from './components/OrderDetailsSection';
 import { OrderItemsSection } from './components/OrderItemsSection';
 import { ShippingSection } from './components/ShippingSection';
 import { OrderSummary } from './components/OrderSummary';
+import { useCalculateMontoTotal } from './hooks/useCalculateMontoTotal';
+import { useCashPayment } from './hooks/useCashPayment';
 
 export default function EditOrderPage() {
     const params = useParams();
@@ -50,6 +52,7 @@ export default function EditOrderPage() {
         setError,
     } = useOrderData(orderId, setValue);
 
+
     const {
         orderItems,
         deletedItemIds,
@@ -62,6 +65,18 @@ export default function EditOrderPage() {
         handleUpdateItemQuantity,
         getProductName,
     } = useOrderItems(orderId, products, setValue, watch);
+
+    // update the discount field when coupon or subtotal changes
+    useCalculateMontoTotal({
+      watch,
+      setValue,
+      cupons: coupons,
+      shippingMethods: shippingMethods,
+      orderItems: orderItems,
+    });
+
+    // update saldo when montoTotal or efectivo changes
+    useCashPayment(watch, setValue);
 
     // Utility functions
     const formatPrice = (price: number) => {

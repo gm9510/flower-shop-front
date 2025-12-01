@@ -69,7 +69,7 @@ export const OrderDetailsSection = ({
                             min="0"
                             {...register('subTotal', { valueAsNumber: true })}
                             placeholder="0.00"
-                            disabled={isSubmitting}
+                            disabled={true}
                         />
                         {errors.subTotal && (
                             <p className="text-sm text-red-500 mt-1">{errors.subTotal.message}</p>
@@ -84,7 +84,7 @@ export const OrderDetailsSection = ({
                             min="0"
                             {...register('descuento', { valueAsNumber: true })}
                             placeholder="0.00"
-                            disabled={isSubmitting}
+                            disabled={true}
                         />
                     </div>
                     <div>
@@ -96,7 +96,7 @@ export const OrderDetailsSection = ({
                             min="0"
                             {...register('saldo', { valueAsNumber: true })}
                             placeholder="0.00"
-                            disabled={isSubmitting}
+                            disabled={true}
                         />
                     </div>
                 </div>
@@ -110,7 +110,7 @@ export const OrderDetailsSection = ({
                         min="0"
                         {...register('montoTotal', { valueAsNumber: true })}
                         placeholder="0.00"
-                        disabled={isSubmitting}
+                        disabled={true}
                     />
                     {errors.montoTotal && (
                         <p className="text-sm text-red-500 mt-1">{errors.montoTotal.message}</p>
