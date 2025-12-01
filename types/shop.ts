@@ -154,15 +154,34 @@ export interface Inventario {
 }
 
 // Coupon Types
+export type TipoDescuento = 'porcentaje' | 'monto_fijo';
+
 export interface Cupon {
   id: number;
   codigo: string;
-  tipoDescuento: string;
+  tipoDescuento: TipoDescuento;
   valorDescuento: number;
-  fechaInicio: string;
-  fechaVencimiento: string;
-  activo: boolean;
-  creadoEn: string;
+  validoDesde?: string; // ISO date string
+  validoHasta?: string; // ISO date string
+  limiteUso?: number;
+}
+
+export interface CuponCreate {
+  codigo: string;
+  tipoDescuento: TipoDescuento;
+  valorDescuento: number;
+  validoDesde?: string; // ISO date string
+  validoHasta?: string; // ISO date string
+  limiteUso?: number;
+}
+
+export interface CuponUpdate {
+  codigo?: string;
+  tipoDescuento?: TipoDescuento;
+  valorDescuento?: number;
+  validoDesde?: string; // ISO date string
+  validoHasta?: string; // ISO date string
+  limiteUso?: number;
 }
 
 // Shipping Method Types
