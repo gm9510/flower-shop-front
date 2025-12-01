@@ -42,7 +42,6 @@ export const OrderItemsSection = ({
     setNewItem,
     handleAddItem,
     handleRemoveItem,
-    handleUpdateItemQuantity,
     getProductName,
     formatPrice,
     isSubmitting,
