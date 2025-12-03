@@ -1,5 +1,6 @@
 // API Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 // API Client Class
 class ApiClient {
   private baseURL: string;
@@ -26,8 +27,8 @@ class ApiClient {
       ...options,
     };
 
-    // Add auth token if available
-    const token = this.getAuthToken();
+    // Add Clerk auth token if available (client-side)
+    const token = await this.getAuthToken();
     if (token) {
       config.headers = {
         ...config.headers,
@@ -72,9 +73,17 @@ class ApiClient {
     });
   }
 
-  private getAuthToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('authToken');
+  private async getAuthToken(): Promise<string | null> {
+    // Client-side: Get Clerk token from window.__clerk
+    if (typeof window !== 'undefined' && (window as any).__clerk) {
+      try {
+        const session = await (window as any).__clerk.session;
+        if (session) {
+          return await session.getToken();
+        }
+      } catch (error) {
+        console.error('Error getting Clerk token:', error);
+      }
     }
     return null;
   }
