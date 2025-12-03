@@ -1,5 +1,11 @@
 const MERCADOPAGO_API = "https://api.mercadopago.com/checkout/preferences"
-const ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN
+
+function resolveAccessToken() {
+  if (typeof window === "undefined") {
+    return process.env.MERCADOPAGO_ACCESS_TOKEN
+  }
+  return process.env.NEXT_PUBLIC_MERCADOPAGO_ACCESS_TOKEN
+}
 
 export interface MercadoPagoItemPayload {
   title: string
@@ -37,7 +43,7 @@ const DEFAULT_BACK_URLS = {
 const DEFAULT_AUTO_RETURN: MercadoPagoPreferencePayload["auto_return"] = "approved"
 
 export async function createMercadoPagoPreference(payload: MercadoPagoPreferencePayload): Promise<MercadoPagoPreferenceResponse> {
-  const token = ACCESS_TOKEN
+  const token = resolveAccessToken()
   if (!token) {
     throw new Error("MercadoPago no está configurado correctamente.")
   }
