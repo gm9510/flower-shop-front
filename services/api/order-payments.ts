@@ -3,21 +3,21 @@ import { apiClient } from '@/lib/api';
 // Order Payment (PedidoPago) Types
 export interface PedidoPago {
   id: number;
-  pedidoId: number;
+  idPedido: number;
   monto: number;
   fechaPago: string;
   metodoPago: string;
   estadoPago: string;
-  referencia?: string;
+  pasarelaPagoId?: string;
 }
 
 export interface PedidoPagoCreate {
-  pedidoId: number;
+  idPedido: number;
   monto: number;
   fechaPago: string;
   metodoPago: string;
   estadoPago?: string;
-  referencia?: string;
+  pasarelaPagoId?: string;
 }
 
 export interface PedidoPagoUpdate {
@@ -25,7 +25,7 @@ export interface PedidoPagoUpdate {
   fechaPago?: string;
   metodoPago?: string;
   estadoPago?: string;
-  referencia?: string;
+  pasarelaPagoId?: string;
 }
 
 export const orderPaymentService = {

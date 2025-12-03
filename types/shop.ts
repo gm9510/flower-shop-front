@@ -125,6 +125,30 @@ export interface PedidosUpdate {
   usuario?: string;
 }
 
+export interface PedidoItemDetail {
+  id: number;
+  pedidoId: number;
+  productoId: number;
+  nombreProducto: string;
+  cantidad: number;
+  precioUnitario: number;
+  subtotal: number;
+}
+
+export interface PedidosDetail extends PedidosResponse {
+  clienteId?: number;
+  cliente_nombre?: string;
+  cliente_email?: string;
+  entidad_nombre?: string;
+  entidad_email?: string;
+  direccionEnvio?: string;
+  metodo_envio_nombre?: string;
+  cupon_codigo?: string;
+  creadoEn?: string;
+  fechaEnvio?: string;
+  items?: PedidoItemDetail[];
+}
+
 // Paginated Pedidos Response
 export interface PaginatedPedidosResponse {
   items: PedidosResponse[];
@@ -245,7 +269,7 @@ export interface CartItem {
   id: string;
   producto: Producto;
   quantity: number;
-  selectedOptions?: Record<string, any>;
+  selectedOptions?: Record<string, unknown>;
 }
 
 export interface Cart {
