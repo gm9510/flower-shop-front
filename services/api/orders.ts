@@ -21,18 +21,6 @@ export const orderService = {
     return apiClient.get<PaginatedPedidosResponse>('/api/pedidos/', params);
   },
 
-  // Get all orders with optional filtering and pagination (legacy skip/limit)
-  async getPedidos(params?: {
-    skip?: number;
-    limit?: number;
-    idEntidad?: number;
-    estadoPedido?: string;
-    estadoPago?: string;
-    fechaEntregaDesde?: string; // ISO date string
-    fechaEntregaHasta?: string; // ISO date string
-  }): Promise<PedidosResponse[]> {
-    return apiClient.get<PedidosResponse[]>('/api/pedidos/', params);
-  },
 
   // Create a new order
   async createPedido(orderData: PedidosCreate): Promise<PedidosResponse> {
@@ -64,29 +52,29 @@ export const orderService = {
       estadoPago?: string;
     }
   ): Promise<PedidosResponse[]> {
-    return this.getPedidos({ ...params, idEntidad: entidadId });
+    return this.getPedidosPaginated({ ...params, idEntidad: entidadId }).then(response => response.items);
   },
 
   // Helper methods for common operations
   
   // Get recent orders (last 10)
   async getRecentPedidos(): Promise<PedidosResponse[]> {
-    return this.getPedidos({ limit: 10, skip: 0 });
+    return this.getPedidosPaginated({ page_size: 10, page: 1 }).then(response => response.items);
   },
 
   // Get orders by status
   async getPedidosByStatus(status: EstadoPedido): Promise<PedidosResponse[]> {
-    return this.getPedidos({ estadoPedido: status });
+    return this.getPedidosPaginated({ estadoPedido: status }).then(response => response.items);
   },
 
   // Get paid orders
   async getPaidPedidos(): Promise<PedidosResponse[]> {
-    return this.getPedidos({ estadoPago: EstadoPago.PAGADO });
+    return this.getPedidosPaginated({ estadoPago: EstadoPago.PAGADO }).then(response => response.items);
   },
 
   // Get pending orders
   async getPendingPedidos(): Promise<PedidosResponse[]> {
-    return this.getPedidos({ estadoPedido: EstadoPedido.PENDIENTE });
+    return this.getPedidosPaginated({ estadoPedido: EstadoPedido.PENDIENTE }).then(response => response.items);
   },
 
   // Update order to processing status
