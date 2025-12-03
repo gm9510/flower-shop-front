@@ -24,7 +24,8 @@ export default function StatsCards() {
         // TODO: Implement stats calculation from orders
         // The getPedidosStats endpoint doesn't exist in the backend API
         // For now, fetch all orders and calculate stats client-side
-        const orders = await orderService.getPedidos({ limit: 1000 });
+        const ordersPage = await orderService.getPedidosPaginated({ page_size: 1000 });
+        const orders = ordersPage.items;
         const calculatedStats: PedidosStats = {
           total_pedidos: orders.length,
           monto_total_pagado: orders.filter(o => o.estadoPago === 'pagado').reduce((sum, o) => sum + o.montoTotal, 0),
