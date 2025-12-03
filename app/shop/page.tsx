@@ -1,9 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { startTransition, useCallback, useEffect, useState } from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import Navigation from "@/components/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { useCart } from "@/hooks/use-cart"
+import { ensureSessionToken, loadCartFromCookie } from "@/lib/session"
 import { ViewType } from "@/types/shop"
 import HeroSection from "@/components/shop/HeroSection"
 import ProductsViewComponent from "@/components/shop/ProductsView"
@@ -14,15 +16,71 @@ import AboutViewComponent from "@/components/shop/AboutView"
 export default function ShopPage() {
   const [currentView, setCurrentView] = useState<ViewType>("home")
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const { addToCart } = useCart()
   const { toast } = useToast()
 
-  const handleNavigate = (view: string, productId?: number) => {
-    setCurrentView(view as ViewType)
-    if (productId) {
-      setSelectedProductId(productId)
+  const syncProductQuery = useCallback(
+    (productId?: number) => {
+      if (typeof window === "undefined") return
+      const params = new URLSearchParams(window.location.search)
+      if (productId) {
+        params.set("product", productId.toString())
+      } else {
+        params.delete("product")
+      }
+      const query = params.toString()
+      const url = query ? `${pathname}?${query}` : pathname
+      router.replace(url, { scroll: false })
+    },
+    [pathname, router],
+  )
+
+  const handleNavigate = useCallback(
+    (view: string, productId?: number) => {
+      const nextView = view as ViewType
+      setCurrentView(nextView)
+
+      if (nextView === "detail" && productId) {
+        setSelectedProductId(productId)
+        syncProductQuery(productId)
+      } else {
+        setSelectedProductId(null)
+        syncProductQuery(undefined)
+      }
+    },
+    [syncProductQuery],
+  )
+
+  useEffect(() => {
+    ensureSessionToken()
+    if (typeof window !== "undefined") {
+      const storedCart = loadCartFromCookie()
+      if (storedCart.length) {
+        useCart.setState({ items: storedCart })
+      }
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    const productParam = searchParams.get("product")
+    const parsedId = productParam ? Number(productParam) : null
+
+    if (parsedId && !Number.isNaN(parsedId)) {
+      startTransition(() => {
+        setCurrentView("detail")
+        setSelectedProductId(parsedId)
+      })
+      return
+    }
+
+    startTransition(() => {
+      setSelectedProductId((prev) => (prev !== null ? null : prev))
+      setCurrentView((prev) => (prev === "detail" ? "products" : prev))
+    })
+  }, [searchParams])
 
   const handleAddToCart = (product: { id: number; name: string; price: number; image: string }, quantity: number) => {
     addToCart(product, quantity)

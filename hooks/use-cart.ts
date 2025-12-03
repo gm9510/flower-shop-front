@@ -1,9 +1,11 @@
 "use client"
 
 import { create } from "zustand"
+import { persistCartToCookie } from "@/lib/session"
 
 interface CartItem {
   id: number
+  title: string
   name: string
   price: number
   quantity: number
@@ -31,7 +33,14 @@ export const useCart = create<CartStore>((set) => ({
         }
       }
       return {
-        items: [...state.items, { ...product, quantity }],
+        items: [
+          ...state.items,
+          {
+            ...product,
+            title: product.name,
+            quantity,
+          },
+        ],
       }
     }),
   removeFromCart: (productId) =>
@@ -51,3 +60,9 @@ export const useCart = create<CartStore>((set) => ({
     }),
   clearCart: () => set({ items: [] }),
 }))
+
+if (typeof window !== "undefined") {
+  useCart.subscribe((state) => {
+    persistCartToCookie(state.items)
+  })
+}
