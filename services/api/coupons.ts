@@ -1,45 +1,45 @@
 import { apiClient } from '@/lib/api';
-import type { Cupon, MetodoEnvio } from '@/types/shop';
+import type { Cupon, CuponCreate, CuponUpdate } from '@/types/shop';
 
 export const couponService = {
   // Get all coupons
   async getCupones(params?: {
     skip?: number;
     limit?: number;
-    activo?: boolean;
-    codigo?: string;
+    code?: string;
+    active?: boolean;
   }): Promise<Cupon[]> {
-    return apiClient.get<Cupon[]>('/cupones', params);
+    return apiClient.get<Cupon[]>('/api/pedidocupones/', params);
   },
 
   // Get active coupons only
   async getActiveCupones(): Promise<Cupon[]> {
-    return this.getCupones({ activo: true });
+    return this.getCupones({ active: true });
   },
 
   // Create new coupon
-  async createCupon(couponData: Omit<Cupon, 'id' | 'creadoEn'>): Promise<Cupon> {
-    return apiClient.post<Cupon>('/cupones', couponData);
+  async createCupon(couponData: CuponCreate): Promise<Cupon> {
+    return apiClient.post<Cupon>('/api/pedidocupones/', couponData);
   },
 
   // Get single coupon by ID
   async getCupon(id: number): Promise<Cupon> {
-    return apiClient.get<Cupon>(`/cupones/${id}`);
+    return apiClient.get<Cupon>(`/api/pedidocupones/${id}`);
   },
 
   // Update coupon
-  async updateCupon(id: number, updates: Partial<Cupon>): Promise<Cupon> {
-    return apiClient.put<Cupon>(`/cupones/${id}`, updates);
+  async updateCupon(id: number, updates: CuponUpdate): Promise<Cupon> {
+    return apiClient.put<Cupon>(`/api/pedidocupones/${id}`, updates);
   },
 
   // Delete coupon
   async deleteCupon(id: number): Promise<void> {
-    return apiClient.delete<void>(`/cupones/${id}`);
+    return apiClient.delete<void>(`/api/pedidocupones/${id}`);
   },
 
-  // Validate coupon code
+  // Validate coupon code (checks if code exists and is currently valid)
   async validateCupon(codigo: string): Promise<Cupon | null> {
-    const coupons = await this.getCupones({ codigo, activo: true });
+    const coupons = await this.getCupones({ code: codigo, active: true });
     return coupons.length > 0 ? coupons[0] : null;
   },
 };

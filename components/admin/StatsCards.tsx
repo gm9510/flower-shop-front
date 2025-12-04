@@ -21,8 +21,28 @@ export default function StatsCards() {
       try {
         setLoading(true);
         setError(null);
-        const fetchedStats = await orderService.getPedidosStats();
-        setStats(fetchedStats);
+        // TODO: Implement stats calculation from orders
+        // The getPedidosStats endpoint doesn't exist in the backend API
+        // For now, fetch all orders and calculate stats client-side
+        const ordersPage = await orderService.getPedidosPaginated({ page_size: 1000 });
+        const orders = ordersPage.items;
+        const calculatedStats: PedidosStats = {
+          total_pedidos: orders.length,
+          monto_total_pagado: orders.filter(o => o.estadoPago === 'pagado').reduce((sum, o) => sum + o.montoTotal, 0),
+          estados_pago: {
+            completados: orders.filter(o => o.estadoPago === 'pagado').length,
+            fallidos: orders.filter(o => o.estadoPago === 'fallido').length,
+            pendientes: orders.filter(o => o.estadoPago === 'pendiente').length,
+          },
+          estados_pedido: {
+            cancelados: orders.filter(o => o.estadoPedido === 'cancelado').length,
+            entregados: orders.filter(o => o.estadoPedido === 'entregado').length,
+            enviados: orders.filter(o => o.estadoPedido === 'enviado').length,
+            pendientes: orders.filter(o => o.estadoPedido === 'pendiente').length,
+            procesando: orders.filter(o => o.estadoPedido === 'procesando').length,
+          },
+        };
+        setStats(calculatedStats);
       } catch (err: any) {
         console.error('Failed to fetch stats:', err);
         setError('Failed to load statistics');

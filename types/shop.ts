@@ -1,18 +1,38 @@
+// Shop View Types
+export type ViewType = "home" | "products" | "detail" | "cart" | "about"
+
 // Product Types (based on backend ProductoResponse)
 export interface Producto {
   id: number;
   nombre: string;
+  precioVenta: number;
+  tipo: 'SIMPLE' | 'ENSAMBLE' | string;
+  categoria?: string;
+  codbarra?: string;
+  estado?: string;
   descripcion?: string;
-  precio: number;
-  categoriaId?: number;
   imagenUrl?: string;
 }
 
 export interface ProductoCreate {
   nombre: string;
+  precioVenta: number;
+  tipo: 'SIMPLE' | 'ENSAMBLE' | string;
+  categoria?: string;
+  codbarra?: string;
+  estado?: string;
   descripcion?: string;
-  precio: number;
-  categoriaId?: number;
+  imagenUrl?: string;
+}
+
+export interface ProductoUpdate {
+  nombre?: string;
+  precioVenta?: number;
+  tipo?: 'SIMPLE' | 'ENSAMBLE' | string;
+  categoria?: string;
+  codbarra?: string;
+  estado?: string;
+  descripcion?: string;
   imagenUrl?: string;
 }
 
@@ -26,48 +46,6 @@ export interface Categoria {
 export interface CategoriaCreate {
   nombre: string;
   descripcion?: string;
-}
-
-// Order Types (based on backend schemas)
-export interface PedidosResponse {
-  id: number;
-  clienteId: number;
-  montoTotal: number;
-  estadoPedido: string;
-  estadoPago: string;
-  metodoPago?: string;
-  direccionEnvio?: string;
-  cuponId?: number;
-  metodoEnvioId?: number;
-  creadoEn: string; // ISO date string
-}
-
-export interface PedidosDetail extends PedidosResponse {
-  cliente_nombre?: string;
-  cliente_email?: string;
-  cupon_codigo?: string;
-  metodo_envio_nombre?: string;
-}
-
-export interface PedidosCreate {
-  clienteId: number;
-  montoTotal: number;
-  estadoPedido?: string;
-  estadoPago?: string;
-  metodoPago?: string;
-  direccionEnvio?: string;
-  cuponId?: number;
-  metodoEnvioId?: number;
-}
-
-export interface PedidosUpdate {
-  montoTotal?: number;
-  estadoPedido?: string;
-  estadoPago?: string;
-  metodoPago?: string;
-  direccionEnvio?: string;
-  cuponId?: number;
-  metodoEnvioId?: number;
 }
 
 // Order Status Enums
@@ -86,26 +64,136 @@ export enum EstadoPago {
   REEMBOLSADO = 'reembolsado'
 }
 
-// Client Types (based on backend ClienteResponse)
-export interface Cliente {
+// Order Types (based on backend schemas)
+export interface PedidosResponse {
   id: number;
-  nombre: string;
-  apellido: string;
-  email: string;
-  telefono?: string;
-  direccion?: string;
-  fechaNacimiento?: string;
-  creadoEn: string;
+  numeroFactura?: number;
+  idEntidad: number;
+  subTotal: number;
+  descuento?: number;
+  montoTotal: number;
+  saldo?: number;
+  estadoPedido: EstadoPedido;
+  estadoPago: EstadoPago;
+  metodoPago?: string;
+  direccionEnvio?: string;
+  fechaEntrega: string; // ISO date string
+  idCupon?: number;
+  idEnvio?: number;
+  efectivo?: number;
+  transferencia?: number;
+  usuario?: string;
+  registro?: string; // ISO date string
 }
 
-export interface ClienteCreate {
-  nombre: string;
-  apellido: string;
-  email: string;
-  telefono?: string;
-  direccion?: string;
-  fechaNacimiento?: string;
+export interface PedidosCreate {
+  numeroFactura?: number;
+  idEntidad: number;
+  subTotal: number;
+  descuento?: number;
+  montoTotal: number;
+  saldo?: number;
+  estadoPedido?: EstadoPedido;
+  estadoPago?: EstadoPago;
+  metodoPago?: string;
+  direccionEnvio?: string;
+  fechaEntrega: string; // ISO date string
+  idCupon?: number;
+  idEnvio?: number;
+  efectivo?: number;
+  transferencia?: number;
+  usuario?: string;
+  registro?: string;
 }
+
+export interface PedidosUpdate {
+  numeroFactura?: number;
+  idEntidad?: number;
+  subTotal?: number;
+  descuento?: number;
+  montoTotal?: number;
+  saldo?: number;
+  estadoPedido?: EstadoPedido;
+  estadoPago?: EstadoPago;
+  metodoPago?: string;
+  direccionEnvio?: string;
+  fechaEntrega?: string; // ISO date string
+  idCupon?: number;
+  idEnvio?: number;
+  efectivo?: number;
+  transferencia?: number;
+  usuario?: string;
+}
+
+export interface PedidoItemDetail {
+  id: number;
+  pedidoId: number;
+  productoId: number;
+  nombreProducto: string;
+  cantidad: number;
+  precioUnitario: number;
+  subtotal: number;
+}
+
+export interface PedidosDetail extends PedidosResponse {
+  clienteId?: number;
+  cliente_nombre?: string;
+  cliente_email?: string;
+  entidad_nombre?: string;
+  entidad_email?: string;
+  direccionEnvio?: string;
+  metodo_envio_nombre?: string;
+  cupon_codigo?: string;
+  creadoEn?: string;
+  fechaEnvio?: string;
+  items?: PedidoItemDetail[];
+}
+
+// Paginated Pedidos Response
+export interface PaginatedPedidosResponse {
+  items: PedidosResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+
+// Entity Types (based on backend EntityResponse)
+export interface Entity {
+  id: number;
+  nit: string;
+  dv: number;
+  nombre: string;
+  telefono?: string;
+  correo: string;
+  estado: boolean;
+  direccion?: string;
+}
+
+export interface EntityCreate {
+  nit: string;
+  dv: number;
+  nombre: string;
+  telefono?: string;
+  correo: string;
+  estado?: boolean;
+  direccion?: string;
+}
+
+export interface EntityUpdate {
+  nit?: string;
+  dv?: number;
+  nombre?: string;
+  telefono?: string;
+  correo?: string;
+  estado?: boolean;
+  direccion?: string;
+}
+
+// Legacy alias for backwards compatibility
+export type Cliente = Entity;
+export type ClienteCreate = EntityCreate;
 
 // Inventory Types
 export interface Inventario {
@@ -117,15 +205,34 @@ export interface Inventario {
 }
 
 // Coupon Types
+export type TipoDescuento = 'porcentaje' | 'monto_fijo';
+
 export interface Cupon {
   id: number;
   codigo: string;
-  tipoDescuento: string;
+  tipoDescuento: TipoDescuento;
   valorDescuento: number;
-  fechaInicio: string;
-  fechaVencimiento: string;
-  activo: boolean;
-  creadoEn: string;
+  validoDesde?: string; // ISO date string
+  validoHasta?: string; // ISO date string
+  limiteUso?: number;
+}
+
+export interface CuponCreate {
+  codigo: string;
+  tipoDescuento: TipoDescuento;
+  valorDescuento: number;
+  validoDesde?: string; // ISO date string
+  validoHasta?: string; // ISO date string
+  limiteUso?: number;
+}
+
+export interface CuponUpdate {
+  codigo?: string;
+  tipoDescuento?: TipoDescuento;
+  valorDescuento?: number;
+  validoDesde?: string; // ISO date string
+  validoHasta?: string; // ISO date string
+  limiteUso?: number;
 }
 
 // Shipping Method Types
@@ -137,12 +244,32 @@ export interface MetodoEnvio {
   tiempoEstimado?: string;
 }
 
+// Product Assembly Types
+export interface ProductoEnsamble {
+  id: number;
+  idProductoPadre: number;
+  idProductoHijo: number;
+  cantidad: number;
+}
+
+export interface ProductoEnsambleCreate {
+  idProductoPadre: number;
+  idProductoHijo: number;
+  cantidad: number;
+}
+
+export interface ProductoEnsambleUpdate {
+  idProductoPadre: number;
+  idProductoHijo: number;
+  cantidad?: number;
+}
+
 // Cart Types (for frontend use)
 export interface CartItem {
   id: string;
   producto: Producto;
   quantity: number;
-  selectedOptions?: Record<string, any>;
+  selectedOptions?: Record<string, unknown>;
 }
 
 export interface Cart {

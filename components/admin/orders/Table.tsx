@@ -87,8 +87,8 @@ export default function OrdersTable({
                 <TableHead>Pedido #</TableHead>
                 <TableHead>Cliente</TableHead>
                 <TableHead>Fecha</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Método de Pago</TableHead>
+                <TableHead>Estado de Pedido</TableHead>
+                <TableHead>Estado de Pago</TableHead>
                 <TableHead className="text-right">Monto Total</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -134,16 +134,16 @@ export default function OrdersTable({
                 orders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">#{order.id}</TableCell>
-                    <TableCell>Cliente {order.clienteId}</TableCell>
+                    <TableCell>Cliente {order.idEntidad}</TableCell>
                     <TableCell>
-                      {new Date(order.creadoEn).toLocaleDateString('es-CO')}
+                      {order.registro}
                     </TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(order.estadoPedido)}>
                         {getStatusLabel(order.estadoPedido)}
                       </Badge>
                     </TableCell>
-                    <TableCell>{order.metodoPago || 'No especificado'}</TableCell>
+                    <TableCell>{order.estadoPago || 'No especificado'}</TableCell>
                     <TableCell className="text-right font-medium">
                       {formatCurrency(order.montoTotal)}
                     </TableCell>

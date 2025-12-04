@@ -1,9 +1,13 @@
+'use client';
+
 import Header from '@/components/layout/header';
-import OrdersTable from '@/components/admin/OrdersTable';
+import OrdersTable from '@/components/admin/orders/OrdersTable';
 import QuickActions from '@/components/admin/QuickActions';
 import StatsCards from '@/components/admin/StatsCards';
+import { useClerk } from '@clerk/nextjs';
 
 export default function AdminPage() {
+    const clerk = useClerk()
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Admin Header */}

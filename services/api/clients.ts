@@ -1,47 +1,62 @@
 import { apiClient } from '@/lib/api';
-import type { Cliente, ClienteCreate } from '@/types/shop';
+import type { Entity, EntityCreate, EntityUpdate, Cliente, ClienteCreate } from '@/types/shop';
 
-export const clientService = {
-  // Get all clients
-  async getClientes(params?: {
+export const entityService = {
+  // Get all entities
+  async getEntidades(params?: {
     skip?: number;
     limit?: number;
-    nombre?: string;
-    email?: string;
-  }): Promise<Cliente[]> {
-    return apiClient.get<Cliente[]>('/clientes', params);
+    search?: string;
+  }): Promise<Entity[]> {
+    return apiClient.get<Entity[]>('/api/entidades/', params);
   },
 
-  // Create new client
-  async createCliente(clientData: ClienteCreate): Promise<Cliente> {
-    return apiClient.post<Cliente>('/clientes', clientData);
+  // Create new entity
+  async createEntidad(entityData: EntityCreate): Promise<Entity> {
+    return apiClient.post<Entity>('/api/entidades/', entityData);
   },
 
-  // Get single client by ID (assuming endpoint exists)
-  async getCliente(id: number): Promise<Cliente> {
-    return apiClient.get<Cliente>(`/clientes/${id}`);
+  // Get single entity by ID
+  async getEntidad(id: number): Promise<Entity> {
+    return apiClient.get<Entity>(`/api/entidades/${id}`);
   },
 
-  // Update client (assuming endpoint exists)
-  async updateCliente(id: number, updates: Partial<ClienteCreate>): Promise<Cliente> {
-    return apiClient.put<Cliente>(`/clientes/${id}`, updates);
+  // Update entity
+  async updateEntidad(id: number, updates: EntityUpdate): Promise<Entity> {
+    return apiClient.put<Entity>(`/api/entidades/${id}`, updates);
   },
 
-  // Delete client (assuming endpoint exists)
-  async deleteCliente(id: number): Promise<void> {
-    return apiClient.delete<void>(`/clientes/${id}`);
+  // Delete entity
+  async deleteEntidad(id: number): Promise<void> {
+    return apiClient.delete<void>(`/api/entidades/${id}`);
   },
 
-  // Search clients by email
-  async findByEmail(email: string): Promise<Cliente | null> {
-    const clients = await this.getClientes({ email });
-    return clients.length > 0 ? clients[0] : null;
+  // Search entities by any field (nombre, nit, direccion, etc.)
+  async searchEntidades(searchTerm: string): Promise<Entity[]> {
+    return this.getEntidades({ search: searchTerm });
   },
 
-  // Get client orders (using order service)
-  async getClientOrders(clienteId: number) {
-    // This would use the orderService.getPedidosByCliente method
-    const { orderService } = await import('./orders');
-    return orderService.getPedidosByCliente(clienteId);
+  // Find entity by correo
+  async findByCorreo(correo: string): Promise<Entity | null> {
+    const entities = await this.searchEntidades(correo);
+    const found = entities.find(e => e.correo.toLowerCase() === correo.toLowerCase());
+    return found || null;
   },
+};
+
+// Legacy alias for backwards compatibility
+export const clientService = {
+  getClientes: (params?: { skip?: number; limit?: number; nombre?: string; email?: string }) => {
+    const searchParam = params?.nombre || params?.email;
+    return entityService.getEntidades({
+      skip: params?.skip,
+      limit: params?.limit,
+      search: searchParam
+    });
+  },
+  createCliente: (data: ClienteCreate) => entityService.createEntidad(data as EntityCreate),
+  getCliente: (id: number) => entityService.getEntidad(id),
+  updateCliente: (id: number, updates: Partial<ClienteCreate>) => entityService.updateEntidad(id, updates as EntityUpdate),
+  deleteCliente: (id: number) => entityService.deleteEntidad(id),
+  findByEmail: (email: string) => entityService.findByCorreo(email),
 };

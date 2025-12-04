@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PedidosResponse, PedidosDetail, EstadoPedido, EstadoPago } from "@/types/shop";
+import { PedidosResponse, EstadoPedido } from "@/types/shop";
 import { orderService } from '@/services';
 
 interface OrdersTableProps {
@@ -23,48 +23,7 @@ interface OrdersTableProps {
 }
 
 // Mock data for fallback
-const mockOrders: PedidosResponse[] = [
-  { 
-    id: 1001, 
-    clienteId: 1,
-    montoTotal: 89.99,
-    estadoPedido: 'procesando',
-    estadoPago: 'pagado',
-    metodoPago: 'tarjeta_credito',
-    direccionEnvio: 'Av. Principal 123',
-    creadoEn: '2024-11-01T10:00:00Z'
-  },
-  { 
-    id: 1002, 
-    clienteId: 2,
-    montoTotal: 124.50,
-    estadoPedido: 'enviado',
-    estadoPago: 'pagado',
-    metodoPago: 'transferencia',
-    direccionEnvio: 'Calle Secundaria 456',
-    creadoEn: '2024-10-31T15:30:00Z'
-  },
-  { 
-    id: 1003, 
-    clienteId: 3,
-    montoTotal: 67.25,
-    estadoPedido: 'entregado',
-    estadoPago: 'pagado',
-    metodoPago: 'efectivo',
-    direccionEnvio: 'Plaza Central 789',
-    creadoEn: '2024-10-30T09:15:00Z'
-  },
-  { 
-    id: 1004, 
-    clienteId: 4,
-    montoTotal: 156.75,
-    estadoPedido: 'pendiente',
-    estadoPago: 'pendiente',
-    metodoPago: 'tarjeta_debito',
-    direccionEnvio: 'Barrio Norte 321',
-    creadoEn: '2024-10-30T14:45:00Z'
-  },
-];
+const mockOrders: PedidosResponse[] = [];
 
 const getStatusVariant = (status: string) => {
   switch (status.toLowerCase()) {
@@ -162,13 +121,14 @@ export default function OrdersTable({
 
   const handleStatusUpdate = async (orderId: number, newStatus: string) => {
     try {
-      await orderService.updatePedidoEstado(orderId, { estado_pedido: newStatus });
+      const order = await orderService.getPedido(orderId);
+      await orderService.updatePedido(orderId, { ...order, estadoPedido: newStatus as EstadoPedido });
       
       // Update local state
       setOrdersData(prevOrders => 
         prevOrders.map(order => 
           order.id === orderId 
-            ? { ...order, estadoPedido: newStatus }
+            ? { ...order, estadoPedido: newStatus as EstadoPedido }
             : order
         )
       );
@@ -224,7 +184,7 @@ export default function OrdersTable({
                   #{order.id}
                 </TableCell>
                 <TableCell className="text-gray-700">
-                  Cliente {order.clienteId}
+                  Cliente {order.idEntidad}
                 </TableCell>
                 <TableCell className="text-right font-semibold text-gray-900">
                   {formatCurrency(order.montoTotal)}
@@ -238,7 +198,7 @@ export default function OrdersTable({
                   </Badge>
                 </TableCell>
                 <TableCell className="text-center text-sm text-gray-500">
-                  {formatDate(order.creadoEn)}
+                  {formatDate(order.registro || '')}
                 </TableCell>
                 {showActions && (
                   <TableCell className="text-right">

@@ -4,11 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   RotateCcw, 
-  Printer 
+  Printer,
+  Plus
 } from "lucide-react";
-import CreateOrderDrawer from './CreateOrderDrawer';
+import { useRouter } from "next/navigation";
 
 export default function QuickActions() {
+  const router = useRouter();
+
+  const handleCreateOrder = () => {
+    router.push('/admin/orders/create');
+  };
+
   const handleRefund = () => {
     console.log("Reembolsar Pedido");
     // Add refund logic here
@@ -25,7 +32,23 @@ export default function QuickActions() {
         <CardTitle>Acciones Rápidas</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <CreateOrderDrawer />
+        <Button
+          variant="default"
+          className="w-full h-auto p-4 justify-start"
+          onClick={handleCreateOrder}
+        >
+          <div className="flex items-center space-x-3">
+            <div className="flex-shrink-0">
+              <Plus className="h-4 w-4" />
+            </div>
+            <div className="text-left">
+              <div className="font-medium">Crear Pedido</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Registrar un nuevo pedido
+              </div>
+            </div>
+          </div>
+        </Button>
 
         <Button
           variant="secondary"

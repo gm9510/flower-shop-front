@@ -1,62 +1,131 @@
-import React from 'react';
+"use client";
 
+import { Suspense, startTransition, useCallback, useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Navigation from "@/components/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { useCart } from "@/hooks/use-cart";
+import { ensureSessionToken, loadCartFromCookie } from "@/lib/session";
+import { ViewType } from "@/types/shop";
+import HeroSection from "@/components/shop/HeroSection";
+import ProductsViewComponent from "@/components/shop/ProductsView";
+import ProductDetailViewComponent from "@/components/shop/ProductDetailView";
+import CartViewComponent from "@/components/shop/CartView";
+import AboutViewComponent from "@/components/shop/AboutView";
+
+// 👇 Toda tu lógica actual la metemos en este componente interno
+function ShopPageInner() {
+  const [currentView, setCurrentView] = useState<ViewType>("home");
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { addToCart } = useCart();
+  const { toast } = useToast();
+
+  const syncProductQuery = useCallback(
+    (productId?: number) => {
+      if (typeof window === "undefined") return;
+      const params = new URLSearchParams(window.location.search);
+      if (productId) {
+        params.set("product", productId.toString());
+      } else {
+        params.delete("product");
+      }
+      const query = params.toString();
+      const url = query ? `${pathname}?${query}` : pathname;
+      router.replace(url, { scroll: false });
+    },
+    [pathname, router]
+  );
+
+  const handleNavigate = useCallback(
+    (view: string, productId?: number) => {
+      const nextView = view as ViewType;
+      setCurrentView(nextView);
+
+      if (nextView === "detail" && productId) {
+        setSelectedProductId(productId);
+        syncProductQuery(productId);
+      } else {
+        setSelectedProductId(null);
+        syncProductQuery(undefined);
+      }
+    },
+    [syncProductQuery]
+  );
+
+  useEffect(() => {
+    ensureSessionToken();
+    if (typeof window !== "undefined") {
+      const storedCart = loadCartFromCookie();
+      if (storedCart.length) {
+        useCart.setState({ items: storedCart });
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const productParam = searchParams.get("product");
+    const parsedId = productParam ? Number(productParam) : null;
+
+    if (parsedId && !Number.isNaN(parsedId)) {
+      startTransition(() => {
+        setCurrentView("detail");
+        setSelectedProductId(parsedId);
+      });
+      return;
+    }
+
+    startTransition(() => {
+      setSelectedProductId((prev) => (prev !== null ? null : prev));
+      setCurrentView((prev) => (prev === "detail" ? "products" : prev));
+    });
+  }, [searchParams]);
+
+  const handleAddToCart = (
+    product: { id: number; name: string; price: number; image: string },
+    quantity: number
+  ) => {
+    addToCart(product, quantity);
+    toast({
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation onNavigate={handleNavigate} />
+
+      <main className="py-12">
+        {currentView === "home" && <HeroSection onNavigate={handleNavigate} />}
+        {currentView === "products" && (
+          <ProductsViewComponent
+            onNavigate={handleNavigate}
+            onAddToCart={handleAddToCart}
+          />
+        )}
+        {currentView === "detail" && selectedProductId && (
+          <ProductDetailViewComponent
+            productId={selectedProductId}
+            onNavigate={handleNavigate}
+            onAddToCart={handleAddToCart}
+          />
+        )}
+        {currentView === "cart" && <CartViewComponent onNavigate={handleNavigate} />}
+        {currentView === "about" && <AboutViewComponent />}
+      </main>
+    </div>
+  );
+}
+
+// 👇 Este es el default export que Next usa como page "/shop"
+// Lo único que hace es envolver tu lógica en un <Suspense>
 export default function ShopPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">
-            Flower Shop
-          </h1>
-          <p className="text-xl text-gray-600 mb-12">
-            Browse our beautiful collection of fresh flowers
-          </p>
-        </div>
-
-        {/* Placeholder for flower categories */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div className="h-48 bg-pink-100 rounded-lg mb-4 flex items-center justify-center">
-              <span className="text-pink-500 text-lg font-semibold">Roses</span>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Premium Roses</h3>
-            <p className="text-gray-600">Beautiful fresh roses for any occasion</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div className="h-48 bg-yellow-100 rounded-lg mb-4 flex items-center justify-center">
-              <span className="text-yellow-500 text-lg font-semibold">Sunflowers</span>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Bright Sunflowers</h3>
-            <p className="text-gray-600">Cheerful sunflowers to brighten your day</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div className="h-48 bg-purple-100 rounded-lg mb-4 flex items-center justify-center">
-              <span className="text-purple-500 text-lg font-semibold">Tulips</span>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Elegant Tulips</h3>
-            <p className="text-gray-600">Classic tulips in various colors</p>
-          </div>
-        </div>
-
-        {/* Placeholder for featured products */}
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Arrangements</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="border border-gray-200 rounded-lg p-4">
-                <div className="h-32 bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                  <span className="text-gray-500">Product {item}</span>
-                </div>
-                <h4 className="font-semibold mb-1">Arrangement {item}</h4>
-                <p className="text-sm text-gray-600 mb-2">Beautiful flower arrangement</p>
-                <p className="text-lg font-bold text-green-600">${(29.99 + item * 10).toFixed(2)}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+    <Suspense fallback={<div className="p-8 text-center">Loading shop…</div>}>
+      <ShopPageInner />
+    </Suspense>
   );
 }
