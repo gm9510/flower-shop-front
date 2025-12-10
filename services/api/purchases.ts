@@ -3,13 +3,19 @@ import { apiClient } from '@/lib/api';
 // Purchase (Compra) Types
 export interface Compra {
   id: number;
-  proveedorId: number;
-  numeroFactura?: string;
-  fechaCompra: string;
-  montoTotal: number;
-  estadoPago: string;
-  creadoEn: string;
-  actualizadoEn?: string;
+  idEntidad: number;
+  factura: string;
+  subTotal: number;
+  descuento: number;
+  total: number;
+  saldo: number;
+  metodoPago: string;
+  fechaLimite: string | null;
+  efectivo: number | null;
+  transferencia: number | null;
+  observacion: string | null;
+  usuario: string;
+  registro: string; // fecha de registro
 }
 
 export interface CompraCreate {
@@ -31,11 +37,14 @@ export interface CompraUpdate {
 // Purchase Detail (CompraDetalle) Types
 export interface CompraDetalle {
   id: number;
-  compraId: number;
-  productoId: number;
+  idCompra: number;
+  idProducto: number;
   cantidad: number;
-  precioUnitario: number;
-  subtotal: number;
+  costo: number;
+  costoIva: number;
+  iva: number;
+  precioVenta: number;
+  totalUnitario: number;
 }
 
 export interface CompraDetalleCreate {

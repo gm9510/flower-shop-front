@@ -104,10 +104,18 @@ export default function ProductsPage() {
                                 Gestiona el catálogo de productos
                             </p>
                         </div>
-                        <Button onClick={() => router.push('/admin/products/create')}>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Nuevo Producto
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button onClick={() => router.push('/admin/products/create')}>
+                                <Plus className="h-4 w-4 mr-2" />
+                                Nuevo Producto
+                            </Button>
+                            <Button onClick={() => router.push('/admin/entitys')} variant="outline">
+                                Ir a Proveedores
+                            </Button>
+                            <Button onClick={() => router.push('/admin/purchases')} variant="outline">
+                                Ir a Compras
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Filters Card */}
