@@ -54,7 +54,18 @@ export function ensureSessionToken(): string | null {
     return existing
   }
 
-  const token = crypto.randomUUID()
+  //const token = crypto.randomUUID()
+  let token: string
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    token = crypto.randomUUID()
+  } else {
+    // Fallback a un UUID v4 manual si randomUUID no está disponible
+    token = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0
+      const v = c === "x" ? r : (r & 0x3) | 0x8
+      return v.toString(16)
+    })
+  }
   setCookie(SESSION_COOKIE_NAME, token, { maxAge: CART_TTL_SECONDS })
   return token
 }
